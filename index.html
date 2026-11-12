@@ -191,7 +191,7 @@
       <div class="lgroup">
         <span class="lname">星下点</span>
         <span class="sub">纬</span>
-        <input id="inLatT" class="num" type="number" min="-90" max="90" step="0.5" value="36.0" title="纬度（°），北纬为正；可达最大值等于轨道倾角">
+        <input id="inLatT" class="num" type="number" min="-90" max="90" step="0.5" value="36.0" title="纬度（°），北纬为正；可达最大值等于轨道倾角的绝对值 |i|">
         <span class="unit">°</span>
         <span class="sub">经</span>
         <input id="inLonT" class="num" type="number" min="-180" max="180" step="0.5" value="103.0" title="经度（°），东经为正">
@@ -937,9 +937,10 @@ function eastClockNow(){
   return ((t % 24) + 24) % 24;
 }
 
-/* 最东点处的相对赤经（度）：α − Ω = atan2(cos i·sin u, cos u) */
+/* 最东点处的相对赤经（度）：α − Ω = atan2(cos i·sin u, cos u)；|i|=90° 时 cos i 浮点噪声归零 */
 function relRADeg(u){
-  return Math.atan2(Math.cos(S.incl*DEG)*Math.sin(u), Math.cos(u))/DEG;
+  const ci = Math.cos(S.incl*DEG);
+  return Math.atan2(Math.abs(ci) < 1e-12 ? 0 : ci*Math.sin(u), Math.cos(u))/DEG;
 }
 
 /* 当前配置下本圈最东点的惯性赤经（度，0~360） */
@@ -1011,7 +1012,7 @@ function applyLatLon(lat0, lon0){
 
   const uCur = TAU*S.t/T + S.phase*DEG;
   let u = 0;
-  if (si > 1e-6){
+  if (Math.abs(si) > 1e-6){
     const a1 = Math.asin(clamp(Math.sin(lat*DEG)/si, -1, 1));
     const a2 = Math.PI - a1;
     const dA = x => Math.abs(Math.atan2(Math.sin(x-uCur), Math.cos(x-uCur)));
@@ -1025,11 +1026,13 @@ function applyLatLon(lat0, lon0){
   if (S.phase >= 360) S.phase -= 360;
 
   // 升交点经度：把该幅角的经度对到目标（经度由它决定）
-  const relLon = Math.atan2(ci*Math.sin(u), Math.cos(u))/DEG;
+  const ci2 = Math.abs(ci) < 1e-12 ? 0 : ci;
+  const relLon = Math.atan2(ci2*Math.sin(u), Math.cos(u))/DEG;
   let node = lon + S.t*(360/S.rot) - relLon;
   node = ((node % 360) + 360) % 360;
   S.node = Math.round(node*10)/10;
   $('inNode').value = Math.round(S.node);
+  setRAField(eastRANow());                // α 与 Ω 联动同步
   setPlaying(false);
   keepViewReadable();
   syncLabels(); buildOrbit(); syncEastInput(); syncLLInput();
@@ -1190,7 +1193,7 @@ function loop(now){
 try{
   const hp = new URLSearchParams(location.hash.replace(/^#/,''));
   if (hp.has('tsat'))  S.tsat  = clamp(+hp.get('tsat'),0,24);
-  if (hp.has('incl'))  S.incl  = clamp(+hp.get('incl'),0,90);
+  if (hp.has('incl'))  S.incl  = clamp(+hp.get('incl'),-90,90);
   if (hp.has('node'))  S.node  = clamp(+hp.get('node'),0,360);
   if (hp.has('phase')) S.phase = clamp(+hp.get('phase'),0,360);
   if (hp.has('t'))     S.t     = clamp(+hp.get('t'),0,2400);
