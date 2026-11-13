@@ -171,12 +171,31 @@
   .pfoot{display:flex;align-items:center;gap:6px;padding:2px 14px 10px;font-size:11.5px;color:#9a9ba0;user-select:none}
   .pfoot input{accent-color:#7a51e2}
 
-  .preset{margin:10px 8px 0}
+  .preset{margin:10px 8px 0;display:flex;gap:8px}
   .pbtn{
-    width:100%;cursor:pointer;background:#fff;border:1px solid #c9c9cf;border-radius:8px;
-    padding:7px 10px;font-size:12.5px;color:#3a3a3a;letter-spacing:.3px;
+    flex:1;cursor:pointer;background:#fff;border:1px solid #c9c9cf;border-radius:8px;
+    padding:7px 4px;font-size:12.5px;color:#3a3a3a;letter-spacing:.2px;white-space:nowrap;
   }
   .pbtn:hover{border-color:#7a51e2;color:#5a2ec0}
+  .pbtn.sel{font-weight:700;box-shadow:inset 0 0 0 1.6px currentColor}
+  .pbtn.pC.sel{color:#b02a56;border-color:#d6336c}
+  .pbtn.pD.sel{color:#1787ab;border-color:#1f9ece}
+  .pbtn.pE.sel{color:#b87408;border-color:#e8940c}
+
+  /* 卫星显示开关（可多星同显） */
+  .satrow{display:flex;align-items:center;gap:7px;margin:8px 8px 0;padding:0 2px;white-space:nowrap}
+  .satrow .slab{font-size:12px;color:#4d4d4d;letter-spacing:.2px}
+  .chip{
+    display:flex;align-items:center;gap:5px;height:24px;padding:0 10px;cursor:pointer;
+    background:#fff;border:1px solid #c9c9cf;border-radius:12px;font-family:inherit;
+    font-size:11.5px;color:#6a6a70;letter-spacing:.2px;transition:all .15s;
+  }
+  .chip i{display:block;width:8px;height:8px;border-radius:50%;background:#c4c4ca;flex:0 0 auto}
+  .chip:hover{border-color:#7a51e2;color:#5a2ec0}
+  .chip.on{background:#f4f4f6;color:#3a3a3a;font-weight:600}
+  .chip.sel{border-color:#7a51e2;box-shadow:0 0 0 1.5px rgba(107,63,212,.25)}
+  .satrow label{font-size:11.5px;color:#6a6a70;display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:auto}
+  .satrow input{accent-color:#7a51e2}
 
   /* 自转周期二选一 */
   .seg{display:flex;gap:6px}
@@ -217,21 +236,31 @@
           </div>
         </div>
         <div class="ctrl o">
-          <div class="lab"><span>卫星周期</span><span class="val" id="vTsat">16.0 h</span></div>
-          <input id="inTsat" type="range" min="0" max="24" step="0.1" value="16">
+          <div class="lab"><span>卫星周期</span><span class="val" id="vTsat">1.7 h</span></div>
+          <input id="inTsat" type="range" min="0" max="24" step="0.1" value="1.7">
         </div>
         <div class="ctrl g">
-          <div class="lab"><span title="升交点：卫星轨道与天赤道的交点，卫星自南向北穿越赤道的那一个点；其赤经记为 Ω">升交点赤经 Ω</span><span class="val" id="vNode">298°</span></div>
-          <input id="inNode" type="range" class="r-green" min="0" max="360" step="1" value="298" title="拖动时最东点赤经 α 同步变化（α = Ω + 90°）">
+          <div class="lab"><span title="升交点：卫星轨道与天赤道的交点，卫星自南向北穿越赤道的那一个点；其赤经记为 Ω">升交点赤经 Ω</span><span class="val" id="vNode">210°</span></div>
+          <input id="inNode" type="range" class="r-green" min="0" max="360" step="1" value="210" title="拖动时最东点赤经 α 同步变化（α = Ω + 90°）">
         </div>
         <div class="ctrl g">
-          <div class="lab"><span title="轨道倾角 i（°）：0°=赤道轨道，±90°=极地轨道，|i|>90° 为逆行轨道；|i| 为可达的最大纬度绝对值。太阳同步轨道 i≈98.8°">轨道倾角</span><span class="val" id="vIncl">36°</span></div>
-          <input id="inIncl" type="range" class="r-green" min="-180" max="180" step="1" value="36">
+          <div class="lab"><span title="轨道倾角 i（°）：0°=赤道轨道，±90°=极地轨道，|i|>90° 为逆行轨道；|i| 为可达的最大纬度绝对值。太阳同步轨道 i≈98.8°">轨道倾角</span><span class="val" id="vIncl">98.8°</span></div>
+          <input id="inIncl" type="range" class="r-green" min="-180" max="180" step="1" value="99">
         </div>
       </div>
     </div>
     <div class="preset">
-      <button id="btnFY" class="pbtn" title="风云三号E星（FY-3E）：我国太阳同步晨昏轨道气象卫星。周期 1.7 h（≈102 min）、倾角 98.8°、升交点地方时 06:00；轨道面每天东进 0.9856° 与地球公转同步，故每天以相同地方时过境。选中后昼夜分布与卫星轨道的相对关系即真实晨昏轨道">预设 · 风云E星（太阳同步轨道）</button>
+      <button id="btnFYC" class="pbtn pC" title="风云一号C星（FY-1C）：太阳同步极轨气象卫星。周期 1.6 h、倾角 97.4°、升交点地方时 09:00；轨道面每天东进 0.9856°（J2 摄动）与地球公转同步，过升交点地方时恒定。点击后该星独立选中显示，可在下方开关行叠加其它星">预设 · 风云C星</button>
+      <button id="btnFYD" class="pbtn pD" title="风云一号D星（FY-1D）：太阳同步极轨气象卫星。周期 1.9 h、倾角 99.5°、升交点地方时 15:00；轨道面每天东进 0.9856°（J2 摄动）与地球公转同步。点击后该星独立选中显示，可在下方开关行叠加其它星">预设 · 风云D星</button>
+      <button id="btnFY" class="pbtn pE" title="风云三号E星（FY-3E）：我国太阳同步晨昏轨道气象卫星。周期 1.7 h（≈102 min）、倾角 98.8°、升交点地方时 06:00；轨道面每天东进 0.9856° 与地球公转同步，故每天以相同地方时过境（晨昏轨道）。点击后该星独立选中显示，可在下方开关行叠加其它星">预设 · 风云E星</button>
+    </div>
+
+    <div class="satrow" id="satRow">
+      <span class="slab">显示卫星</span>
+      <button class="chip" data-i="0" title="显示/隐藏 风云C星（可与其它星同时显示；选中星以紫色描边标记，左侧滑块编辑的是选中星）"><i></i>风云C</button>
+      <button class="chip" data-i="1" title="显示/隐藏 风云D星（可与其它星同时显示）"><i></i>风云D</button>
+      <button class="chip" data-i="2" title="显示/隐藏 风云E星（可与其它星同时显示）"><i></i>风云E</button>
+      <label title="隐藏/显示平面图中各卫星的地面轨迹线（卫星位置标记仍保留）"><input type="checkbox" id="chkOrb" checked> 轨道线</label>
     </div>
 
     <div class="daterow">
@@ -277,9 +306,9 @@
     </div>
 
     <div id="legend">
-      <span><i class="red"></i>当前星下点</span>
+      <span><i class="red" id="lgDot"></i>当前星下点</span>
       <span><i class="dia"></i>最东点（升交点逆时针 90°）</span>
-      <span><i class="line"></i>最近 24 小时轨迹</span>
+      <span><i class="line" id="lgLine"></i>最近 24 小时轨迹</span>
     </div>
 
     <div id="mapbox"><canvas id="map"></canvas><button id="btnDN" title="显示/隐藏昼夜半球分布（同时作用于平面图与右侧 3D 地球）">昼夜分布：开</button></div>
@@ -305,9 +334,9 @@
 
   <section id="right">
     <canvas id="globe"></canvas>
-    <button id="btnPrec" title="显示/隐藏：地球公转时风云E星轨道面进动演示">公转进动</button>
+    <button id="btnPrec" title="显示/隐藏：地球公转时各太阳同步卫星轨道面进动演示（多星对比）">公转进动</button>
     <div id="precWin">
-      <div class="phead"><span>地球公转 · 轨道面进动（风云E星）</span><button id="btnPrecClose" title="隐藏窗口">×</button></div>
+      <div class="phead"><span>地球公转 · 轨道面进动（多星对比）</span><button id="btnPrecClose" title="隐藏窗口">×</button></div>
       <canvas id="prec"></canvas>
       <div class="pinfo" id="precInfo"></div>
       <div class="pfoot"><label><input type="checkbox" id="chkFast"> 时间加速 ×100（整页同步，日期随之变化）</label></div>
@@ -457,9 +486,11 @@ const cross3 = (a,b)=> [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]
 const norm3 = a => { const m=Math.hypot(a[0],a[1],a[2])||1; return [a[0]/m,a[1]/m,a[2]/m]; };
 
 /* ================= 状态 ================= */
-/* 默认参数（页面打开与「重置」都回到这一组）
-   T=16h、i=36°、Ω=298°、19:00 时卫星正位于最东点（u=90°），星下点 36.0°N 103.0°E */
-const DEFAULTS = { tsat:16, incl:36, node:298, phase:22.5, t:67 };
+/* 默认参数（页面打开与「重置」都回到这一组）＝「预设·风云E星」
+   风云三号E星：T=1.7h、i=98.8°、太阳同步晨昏轨道 LTAN 06:00 ⇒ Ω=αs+6×(−15)=210°；
+   phase 使 19:00（t=67h）时卫星正位于最东点（u=90°，约 81.2°N 极区），
+   u = 2π·t/T + phase ⇒ phase = 90° − 360°×67/1.7 = 301.8° */
+const DEFAULTS = { tsat:1.7, incl:98.8, node:210, phase:301.8, t:67 };
 const S = {
   phase: DEFAULTS.phase,   // 沿轨相位（度），由「定位」反解，不再有独立滑块
   rot: 24,                 // 自转周期（小时，固定为地球自转周期）
@@ -467,22 +498,64 @@ const S = {
   node: DEFAULTS.node,     // 升交点赤经 Ω（度）
   incl: DEFAULTS.incl,     // 轨道倾角（度）
   t: DEFAULTS.t,           // 当前时刻（小时，连续递增不回卷）
-  sunSync: false,          // 太阳同步：Ω 每天东进 0.9856°（风云E星预设启用）
+  sunSync: true,           // 太阳同步：Ω 每天东进 0.9856°（默认＝风云E星晨昏轨道）
   playing: true
 };
 const SPEED = 1.0;       // 每秒推进的仿真小时数
 const K_ORB = 1.42;      // 轨道半径 / 地球半径
 
-/* 轨道平面基向量 → 惯性系单位方向 */
-function satAtU(u){
-  const i = S.incl*DEG, O = S.node*DEG;
+/* ================= 三颗卫星（C / D / E） =================
+   每颗卫星有独立的轨道参数与显示开关；S 始终镜像「当前选中」那颗的参数，
+   左侧滑块 / 定位输入框编辑的都是选中卫星（chip 上紫色描边的那颗）。
+   mapCol＝平面图轨迹色，ring/ringF＝3D 轨道环背面/正面色，
+   ltan＝设计的升交点地方时（预设按钮据此反解 Ω）。
+   m ＝ 3D 模型样式（SAT_MODELS 的键）。 */
+const SATS = [
+  { name:'风云一号C星', tag:'风云C', m:'C',
+    mapCol:'#d6336c', ring:'rgba(214,51,108,.45)', ringF:'#ff8aa6',
+    glow:'rgba(255,125,155,.55)', labCol:'#ffc4d3',
+    tsat:1.6, incl:97.4, node:255, phase:130, sunSync:true, ltan:9.0, show:false },
+  { name:'风云一号D星', tag:'风云D', m:'D',
+    mapCol:'#1f9ece', ring:'rgba(31,158,206,.45)', ringF:'#5cc8ef',
+    glow:'rgba(95,190,235,.55)', labCol:'#c3e8f9',
+    tsat:1.9, incl:99.5, node:345, phase:250, sunSync:true, ltan:15.0, show:false },
+  { name:'风云三号E星', tag:'风云E', m:'E',
+    mapCol:'#dd9c14', ring:'rgba(201,216,74,.42)', ringF:'#d9e455',
+    glow:'rgba(230,240,110,.55)', labCol:'#e9f27a',
+    tsat:DEFAULTS.tsat, incl:DEFAULTS.incl, node:DEFAULTS.node, phase:DEFAULTS.phase,
+    sunSync:true, ltan:6.0, show:true }
+];
+let cur = 2;                       // 当前选中卫星的下标（滑块编辑目标）
+/* 「重置」恢复到出厂参数 */
+const SAT_INIT = [
+  { tsat:1.6, incl:97.4, node:255, phase:130, sunSync:true },
+  { tsat:1.9, incl:99.5, node:345, phase:250, sunSync:true },
+  { tsat:DEFAULTS.tsat, incl:DEFAULTS.incl, node:DEFAULTS.node, phase:DEFAULTS.phase, sunSync:true }
+];
+
+/* 3D 卫星模型样式：舱体配色 / 帆板数量与尺寸 / 天线形式，三星各不相同 */
+const SAT_MODELS = {
+  E: { body:[244,214,72],  bh:[.034,.028,.028], panel:[152,192,240], ph:[.006,.046,.080],
+       segs:1, pOff:.104, pGap:0,    cell:'rgba(70,110,190,.8)',  ant:'dish' },
+  C: { body:[236,92,118],  bh:[.030,.026,.026], panel:[250,214,160], ph:[.005,.042,.028],
+       segs:3, pOff:.075, pGap:.034, cell:'rgba(196,110,44,.8)',  ant:'rod'  },
+  D: { body:[116,170,228], bh:[.036,.032,.032], panel:[238,243,250], ph:[.007,.058,.062],
+       segs:1, pOff:.100, pGap:0,    cell:'rgba(90,120,170,.8)',  ant:'dish' }
+};
+
+/* 轨道平面基向量 → 惯性系单位方向（s 缺省＝选中卫星 S） */
+function satAtU(u, s){
+  s = s || S;
+  const i = s.incl*DEG, O = s.node*DEG;
   const ci=Math.cos(i), si=Math.sin(i), cO=Math.cos(O), sO=Math.sin(O);
   const cu=Math.cos(u), su=Math.sin(u);
   // e1=(cO,sO,0)  e2=(-ci*sO, ci*cO, si)
   return [ cu*cO - su*ci*sO, cu*sO + su*ci*cO, su*si ];
 }
-const TAU_T = ()=> Math.max(0.06, S.tsat);
-const satAt = t => satAtU(TAU*t/TAU_T() + S.phase*DEG);
+const TAU_T = ()=> Math.max(0.06, S.tsat);          // 选中卫星周期
+const tauTs = s => Math.max(0.06, s.tsat);          // 任意卫星周期
+function satAt(t){ return satAtU(TAU*t/TAU_T() + S.phase*DEG); }        // 选中卫星
+function satAtS(s, t){ return satAtU(TAU*t/tauTs(s) + s.phase*DEG, s); } // 任意卫星
 
 /* 惯性系方向 → 地理经纬度（考虑地球自转） */
 function geoOf(p, t){
@@ -598,8 +671,9 @@ function drawStatic(){
 /* ================= 星下点轨迹（最近 24 小时，随卫星连续滚动） ================= */
 const TRAIL_H = 24;
 
-function drawTrail(c){
-  const T = TAU_T();
+function drawTrailS(c, s, sel){
+  if (!showOrbits) return;                       // 「轨道线」开关：只隐藏轨迹线，位置标记保留
+  const T = tauTs(s);
   const n = Math.round(clamp(TRAIL_H/T*120, 240, 4000));
   const t1 = S.t;
   const t0 = Math.max(0, t1 - TRAIL_H);
@@ -607,13 +681,14 @@ function drawTrail(c){
   if (span <= 1e-9) return;
 
   c.save();
-  c.strokeStyle = '#dc1f26'; c.lineWidth = 1.5;
+  c.strokeStyle = s.mapCol; c.lineWidth = sel ? 1.6 : 1.1;
+  if (!sel) c.globalAlpha = 0.9;                 // 非选中星略淡，突出选中星
   c.lineJoin = 'round'; c.lineCap = 'round';
   c.beginPath();
   let prevLon = null, started = false;
   for (let k=0; k<=n; k++){
     const t = t0 + span*k/n;
-    const g = geoOf(satAt(t), t);
+    const g = geoOf(satAtS(s, t), t);
     const x = X(g.lon), y = Y(g.lat);
     if (!started || Math.abs(g.lon-prevLon) > 180){ c.moveTo(x,y); started = true; }
     else c.lineTo(x,y);
@@ -721,10 +796,13 @@ function drawMapFrame(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
   drawDayNight(ctx);
-  drawTrail(ctx);
+  // 各可见卫星的最近 24h 轨迹（颜色区分；勾掉「轨道线」时只保留位置标记）
+  for (let si=0; si<SATS.length; si++){
+    if (SATS[si].show) drawTrailS(ctx, SATS[si], si===cur);
+  }
   drawSubsolar(ctx);
 
-  // 本圈最东点（取已发生过的那一个，保证落在轨迹线上）
+  // 本圈最东点（仅选中卫星：与 α 输入框联动；取已发生过的那一个，保证落在轨迹线上）
   const uCur = TAU*S.t/TAU_T() + S.phase*DEG;
   let ue = eastU() + TAU*Math.floor((uCur + 1e-9)/TAU);
   if (ue > uCur) ue -= TAU;
@@ -738,37 +816,50 @@ function drawMapFrame(){
   ctx.strokeStyle = '#ef9420'; ctx.lineWidth = 1.6; ctx.stroke();
   ctx.font = '11px "Segoe UI","Microsoft YaHei",sans-serif';
   ctx.textBaseline = 'bottom';
-  const ty = ey - 8 < L.y0 + 9 ? ey + 22 : ey - 8;
-  ctx.lineWidth = 3; ctx.lineJoin = 'round';
-  ctx.strokeStyle = 'rgba(255,255,255,.92)';
   const eTxt = '最东点 α=' + eastRANow().toFixed(1) + '°';
-  // 靠近画布左右边缘时改为贴边对齐，避免文字被裁掉
   const tw = ctx.measureText(eTxt).width;
   const xR = L.x0 + L.w - 2, xL = L.x0 + 2;
+  // 竖向：默认标在标记上方；贴近上边缘（极轨最东点常在 80°N 以上）时改标在下方并下压一档，
+  // 避免与顶部纬度刻度挤在一起；下方也放不下时再回上方
+  const yTop = L.y0 + 15, yBot = L.y0 + L.h - 6;
+  let ty = ey - 8;
+  if (ty < yTop) ty = Math.min(ey + 26, yBot - 4);
+  if (ty > yBot) ty = Math.max(ey - 26, yTop + 8);
+  // 横向：靠近画布左右边缘时改为贴边对齐，避免文字被裁掉
   let tx = ex, align = 'center';
-  if (ex + tw/2 > xR){ align = 'right'; tx = Math.min(ex + 6, xR); }
-  else if (ex - tw/2 < xL){ align = 'left'; tx = Math.max(ex - 6, xL); }
+  if (ex + tw/2 > xR){ align = 'right'; tx = Math.min(ex - 6, xR - 6); }
+  else if (ex - tw/2 < xL){ align = 'left'; tx = Math.max(ex + 6, xL + 8); }
   ctx.textAlign = align;
+  ctx.lineWidth = 3; ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(255,255,255,.92)';
   ctx.strokeText(eTxt, tx, ty);
   ctx.fillStyle = '#c9761a';
   ctx.fillText(eTxt, tx, ty);
   ctx.restore();
 
-  const g = geoOf(satAt(S.t), S.t);
-  const x = X(g.lon), y = Y(g.lat);
-
-  // 十字准星
-  ctx.strokeStyle = 'rgba(220,31,38,.35)'; ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(x-11,y); ctx.lineTo(x+11,y);
-  ctx.moveTo(x,y-11); ctx.lineTo(x,y+11);
-  ctx.stroke();
-
-  ctx.beginPath(); ctx.arc(x,y,4.1,0,TAU);
-  ctx.fillStyle = '#dc1f26'; ctx.fill();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4; ctx.stroke();
-
-  return g;
+  // 各可见卫星当前位置标记（选中的星加十字准星与大点，其余为小点）
+  let gSel = null;
+  for (let si=0; si<SATS.length; si++){
+    const s = SATS[si]; if (!s.show) continue;
+    const g = geoOf(satAtS(s, S.t), S.t);
+    const x = X(g.lon), y = Y(g.lat);
+    if (si === cur){
+      gSel = g;
+      ctx.strokeStyle = 'rgba(60,60,70,.35)'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x-11,y); ctx.lineTo(x+11,y);
+      ctx.moveTo(x,y-11); ctx.lineTo(x,y+11);
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(x,y,4.1,0,TAU);
+      ctx.fillStyle = s.mapCol; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4; ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(x,y,3,0,TAU);
+      ctx.fillStyle = s.mapCol; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.1; ctx.stroke();
+    }
+  }
+  return gSel;
 }
 
 /* ================= 3D 地球 ================= */
@@ -778,9 +869,10 @@ function camDir(){
   const a = view.lat*DEG, b = view.lon*DEG;
   return [Math.cos(a)*Math.cos(b), Math.cos(a)*Math.sin(b), Math.sin(a)];
 }
-/* 轨道面法向 */
-function orbitNormal(){
-  const i = S.incl*DEG, O = S.node*DEG;
+/* 轨道面法向（s 缺省＝选中卫星） */
+function orbitNormal(s){
+  s = s || S;
+  const i = s.incl*DEG, O = s.node*DEG;
   return [Math.sin(i)*Math.sin(O), -Math.sin(i)*Math.cos(O), Math.cos(i)];
 }
 /* 视角几乎与轨道面共面时，轨道环会退化成一条线：此时回到相对轨道面的标准斜侧视角 */
@@ -858,10 +950,10 @@ function drawGlobe(){
     return out;
   }
 
-  /* ---------- 轨道环（背面） ---------- */
-  if (ORBIT_PTS.length){
-    const orbDirs = latLonDirs(ORBIT_LAT, ORBIT_LON, 0);
-    strokeDirs(orbDirs, K_ORB, false, '#c9d84a', 1.5, 0.42);
+  /* ---------- 轨道环（背面，多星各自颜色） ---------- */
+  for (let si=0; si<SATS.length; si++){
+    const s = SATS[si]; if (!s.show) continue;
+    strokeDirs(orbitDirs(s), K_ORB, false, s.ring, si===cur ? 1.5 : 1.1, 1);
   }
 
   /* ---------- 球体 ---------- */
@@ -983,17 +1075,13 @@ function drawGlobe(){
     c.restore();
   }
 
-  /* ---------- 轨道环（正面） ---------- */
-  if (ORBIT_PTS.length){
-    strokeDirs(latLonDirs(ORBIT_LAT, ORBIT_LON, 0), K_ORB, true, '#d9e455', 1.6, 1);
+  /* ---------- 轨道环（正面，多星各自颜色） ---------- */
+  for (let si=0; si<SATS.length; si++){
+    const s = SATS[si]; if (!s.show) continue;
+    strokeDirs(orbitDirs(s), K_ORB, true, s.ringF, si===cur ? 1.6 : 1.25, 1);
   }
 
-  /* ---------- 卫星（模拟 3D 模型：舱体 + 太阳能帆板 + 对地天线） ---------- */
-  const u = TAU*S.t/TAU_T() + S.phase*DEG;
-  const ps = satAtU(u);
-  const dS = pd(ps);
-  const g = geoOf(ps, S.t);
-
+  /* ---------- 卫星（模拟 3D 模型，可多星同显；选中星最后绘制置顶） ---------- */
   // 世界坐标（单位球坐标系）→ 屏幕，返回 [x, y, 深度]（深度越大越靠近相机）
   function proj3(P){
     return [ cx + R*(P[0]*camR[0]+P[1]*camR[1]+P[2]*camR[2]),
@@ -1025,31 +1113,43 @@ function drawGlobe(){
     return out;
   }
 
-  function drawSatModel(alpha){
-    const i = S.incl*DEG, O = S.node*DEG;
+  /* 各星独立模型：舱体配色、帆板数量/尺寸、天线形式均取自 SAT_MODELS[s.m] */
+  function drawSatModelFor(s, u, ps, alpha){
+    const M = SAT_MODELS[s.m];
+    const i = s.incl*DEG, O = s.node*DEG;
     const e1 = [Math.cos(O), Math.sin(O), 0];
     const e2 = [-Math.cos(i)*Math.sin(O), Math.cos(i)*Math.cos(O), Math.sin(i)];
     const aD = [-Math.sin(u)*e1[0]+Math.cos(u)*e2[0],    // 沿轨道方向（速度）
                 -Math.sin(u)*e1[1]+Math.cos(u)*e2[1],
                 -Math.sin(u)*e1[2]+Math.cos(u)*e2[2]];
-    const nD = orbitNormal();                            // 轨道面法向（帆板展开轴）
+    const nD = orbitNormal(s);                           // 轨道面法向（帆板展开轴）
     const bD = cross3(aD, nD);                           // 面内横向
     const satPos = [ps[0]*K_ORB, ps[1]*K_ORB, ps[2]*K_ORB];
 
     let faces = [];
-    // 本体：黄色舱体，沿轨道方向略长
-    faces = faces.concat(boxFaces(satPos, aD, bD, nD, 0.034, 0.028, 0.028, [244,214,72], null));
-    // 两块太阳能帆板：淡蓝，沿轨道面法向 ± 展开，内缘与舱体相接
-    for (const s of [1,-1]){
-      const pc = [satPos[0]+s*0.104*nD[0], satPos[1]+s*0.104*nD[1], satPos[2]+s*0.104*nD[2]];
-      faces = faces.concat(boxFaces(pc, aD, bD, nD, 0.006, 0.046, 0.080, [152,192,240], 'cell'));
+    // 本体舱体
+    faces = faces.concat(boxFaces(satPos, aD, bD, nD, M.bh[0], M.bh[1], M.bh[2], M.body, null));
+    // 太阳能帆板：沿轨道面法向 ± 展开（C 星每侧三段窄板，E/D 星每侧一块）
+    for (const sg of [1,-1]){
+      for (let q=0; q<M.segs; q++){
+        const off = M.pOff + q*M.pGap;
+        const pc = [satPos[0]+sg*off*nD[0], satPos[1]+sg*off*nD[1], satPos[2]+sg*off*nD[2]];
+        faces = faces.concat(boxFaces(pc, aD, bD, nD, M.ph[0], M.ph[1], M.ph[2], M.panel, 'cell'));
+      }
     }
-    // 对地天线：杆 + 碟形天线（简化为小盘），始终指向地心
+    // 对地天线：碟形（杆+盘）或鞭状杆+端罩，始终指向地心
     const nad = ps;
-    const bc = [satPos[0]-0.048*nad[0], satPos[1]-0.048*nad[1], satPos[2]-0.048*nad[2]];
-    faces = faces.concat(boxFaces(bc, aD, bD, nad, 0.009, 0.009, 0.024, [150,156,168], null));
-    const dc = [satPos[0]-0.076*nad[0], satPos[1]-0.076*nad[1], satPos[2]-0.076*nad[2]];
-    faces = faces.concat(boxFaces(dc, aD, bD, nad, 0.020, 0.020, 0.005, [188,194,205], null));
+    if (M.ant === 'dish'){
+      const bc = [satPos[0]-0.048*nad[0], satPos[1]-0.048*nad[1], satPos[2]-0.048*nad[2]];
+      faces = faces.concat(boxFaces(bc, aD, bD, nad, 0.009, 0.009, 0.024, [150,156,168], null));
+      const dc = [satPos[0]-0.076*nad[0], satPos[1]-0.076*nad[1], satPos[2]-0.076*nad[2]];
+      faces = faces.concat(boxFaces(dc, aD, bD, nad, 0.020, 0.020, 0.005, [188,194,205], null));
+    } else {
+      const bc = [satPos[0]-0.052*nad[0], satPos[1]-0.052*nad[1], satPos[2]-0.052*nad[2]];
+      faces = faces.concat(boxFaces(bc, aD, bD, nad, 0.006, 0.006, 0.030, [150,156,168], null));
+      const tc = [satPos[0]-0.090*nad[0], satPos[1]-0.090*nad[1], satPos[2]-0.090*nad[2]];
+      faces = faces.concat(boxFaces(tc, aD, bD, nad, 0.010, 0.010, 0.007, [222,227,234], null));
+    }
 
     // 画家算法：由远及近绘制
     faces.sort((f1,f2)=>f1.d-f2.d);
@@ -1070,7 +1170,7 @@ function drawGlobe(){
       // 帆板电池格线（仅朝向相机的大面）
       if (f.tag==='cell' && dot3(f.n, camD) > 0){
         const A=f.p[0], B=f.p[1], C2=f.p[3], D2=f.p[2];
-        c.strokeStyle = 'rgba(70,110,190,.8)'; c.lineWidth = 0.8;
+        c.strokeStyle = M.cell; c.lineWidth = 0.8;
         c.beginPath();
         for (const t of [1/3, 2/3]){    // 沿长边方向三分
           c.moveTo(A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t);
@@ -1084,39 +1184,53 @@ function drawGlobe(){
     c.restore();
   }
 
-  const sX = px(ps,K_ORB), sY = py(ps,K_ORB);
-  const gX = px(ps,1),    gY = py(ps,1);
-  const front = dS >= 0;                                   // 是否位于地球近侧
-  const inDisc = Math.hypot(sX-cx, sY-cy) < R - 1;         // 投影是否落在地球圆面内
-  const occluded = !front && inDisc;                       // 只有被地球挡住时才真正不可见
+  /* 逐星绘制：被地球挡住的星完全不可见；远侧未挡住的画半透明；选中星置顶 */
+  const order = [];
+  for (let si=0; si<SATS.length; si++) if (SATS[si].show) order.push(si);
+  order.sort((a,b)=> (a===cur) - (b===cur));
+  let gSel = null;
+  for (const oi of order){
+    const s = SATS[oi];
+    const u = TAU*S.t/tauTs(s) + s.phase*DEG;
+    const ps = satAtU(u, s);
+    const dS = pd(ps);
+    const sel = oi === cur;
+    if (sel) gSel = geoOf(ps, S.t);
 
-  if (!occluded){
+    const sX = px(ps,K_ORB), sY = py(ps,K_ORB);
+    const gX = px(ps,1),    gY = py(ps,1);
+    const front = dS >= 0;                                 // 是否位于地球近侧
+    const inDisc = Math.hypot(sX-cx, sY-cy) < R - 1;       // 投影是否落在地球圆面内
+    const occluded = !front && inDisc;                     // 只有被地球挡住时才真正不可见
+    if (occluded) continue;
+    const ldy = (order.length > 1) ? (oi - 1)*9 : 0;       // 多星同显时标签错开，避免叠在一起
+
     if (front){
-      // 近侧：星下点连线 + 红色星下点 + 柔光 + 3D 卫星模型
+      // 近侧：星下点连线 + 星下点 + 柔光 + 3D 卫星模型 + 标签
       c.save();
       c.setLineDash([6,5]);
-      c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = 1.2;
+      c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = sel ? 1.2 : 0.9;
       c.beginPath(); c.moveTo(sX,sY); c.lineTo(gX,gY); c.stroke();
       c.restore();
 
-      c.beginPath(); c.arc(gX,gY,3,0,TAU);
-      c.fillStyle = '#ff4b4b'; c.fill();
+      c.beginPath(); c.arc(gX,gY,sel?3:2.2,0,TAU);
+      c.fillStyle = s.mapCol; c.fill();
 
       c.save();
-      c.shadowColor = 'rgba(230,240,110,.55)'; c.shadowBlur = 12;
-      c.fillStyle = 'rgba(230,240,110,.12)';
-      c.beginPath(); c.arc(sX,sY,7,0,TAU); c.fill();
+      c.shadowColor = s.glow; c.shadowBlur = sel ? 12 : 8;
+      c.fillStyle = s.glow.replace(/,[.\d]+\)$/, ',.12)');
+      c.beginPath(); c.arc(sX,sY,sel?7:5,0,TAU); c.fill();
       c.restore();
 
-      drawSatModel(1);
+      drawSatModelFor(s, u, ps, 1);
 
-      c.fillStyle = '#e9f27a';
-      c.font = 'italic 13px "Segoe UI","Microsoft YaHei",sans-serif';
+      c.fillStyle = s.labCol;
+      c.font = 'italic ' + (sel?13:12) + 'px "Segoe UI","Microsoft YaHei",sans-serif';
       c.textBaseline = 'middle';
       c.textAlign = 'left';
-      const lw2 = c.measureText('Satellite').width;
-      if (sX + 18 + lw2 > W - 4){ c.textAlign = 'right'; c.fillText('Satellite', sX - 16, sY+1); }
-      else c.fillText('Satellite', sX+18, sY+1);
+      const lw2 = c.measureText(s.tag).width;
+      if (sX + 18 + lw2 > W - 4){ c.textAlign = 'right'; c.fillText(s.tag, sX - 16, sY+1+ldy); }
+      else c.fillText(s.tag, sX+18, sY+1+ldy);
     } else {
       // 远侧但没被地球挡住：画成半透明模型，始终可追踪
       c.save();
@@ -1124,43 +1238,31 @@ function drawGlobe(){
       c.arc(cx,cy,R,0,TAU,true);          // 反向圆 → 挖空地球圆面
       c.clip();
 
-      drawSatModel(0.5);
+      drawSatModelFor(s, u, ps, 0.5);
       c.restore();
 
       // 标签画在裁剪之外：贴着地平线时向地球轮廓外偏，避免被圆面裁掉
-      c.fillStyle = 'rgba(233,242,122,.75)';
+      c.fillStyle = s.labCol.replace(/,[.\d]+\)$/, ',.75)');
       c.font = 'italic 12px "Segoe UI","Microsoft YaHei",sans-serif';
       c.textBaseline = 'middle'; c.textAlign = 'left';
-      let lx = sX + 14, ly = sY + 1;
+      let lx = sX + 14, ly = sY + 1 + ldy;
       if (inDisc){
         const dx = sX-cx, dy = sY-cy, dd = Math.hypot(dx,dy) || 1;
         lx = cx + dx/dd*(R+14); ly = cy + dy/dd*(R+14);
         c.textAlign = dx >= 0 ? 'left' : 'right';
       }
-      c.fillText('Satellite', lx, ly);
+      c.fillText(s.tag, lx, ly);
     }
   }
 
-  return g;
+  return gSel;
 }
 
-/* 轨道环采样点（惯性系经纬度） */
-let ORBIT_LAT = [], ORBIT_LON = [];
-const ORBIT_PTS = {length:0};
-function buildOrbit(){
-  ORBIT_LAT = []; ORBIT_LON = [];
-  for (let deg=0; deg<=361; deg+=2){
-    const p = satAtU(deg*DEG);
-    ORBIT_LAT.push(Math.asin(clamp(p[2],-1,1))/DEG);
-    let lon = Math.atan2(p[1],p[0])/DEG;
-    if (ORBIT_LON.length){
-      let prev = ORBIT_LON[ORBIT_LON.length-1];
-      while (lon - prev > 180) lon -= 360;
-      while (lon - prev < -180) lon += 360;
-    }
-    ORBIT_LON.push(lon);
-  }
-  ORBIT_PTS.length = ORBIT_LAT.length;
+/* 轨道环单位方向（每帧按各星当前参数现算：181 点 × 3 星，开销可忽略） */
+function orbitDirs(s){
+  const pts = new Array(181);
+  for (let d=0; d<=360; d+=2) pts[d/2] = satAtU(d*DEG, s);
+  return pts;
 }
 
 /* ================= 尺寸 ================= */
@@ -1227,7 +1329,7 @@ function applyEastRA(ra){
   setPlaying(false);
   keepViewReadable();
   setRAField(R);
-  syncLabels(); buildOrbit(); syncLLInput(); syncEastInput();
+  syncLabels(); syncLLInput(); syncEastInput();
 }
 
 /* 同时是 24 h 与卫星周期的整数倍的最小跨度（整周期平移不改变钟点与相位） */
@@ -1257,11 +1359,7 @@ function applyEastClock(C){
   const Lp = dayLapPeriod();
   for (let g=0; g<20 && S.t < TRAIL_H - 1e-9 && Lp <= 240; g++) S.t += Lp;   // 补足 24h 轨迹
 
-  if (S.sunSync && S.t !== t0){
-    S.node = ((S.node + (360/S.rot - 15)*(S.t - t0)) % 360 + 360) % 360;  // 太阳同步：Ω 随太阳惯性赤进
-    $('inNode').value = Math.round(S.node);
-    setRAField(eastRANow());
-  }
+  /* 太阳同步卫星的 Ω 进动统一由主循环按 Δt 处理（本函数造成的时间跳变下一帧自动补上） */
 
   setPlaying(false);
   syncLabels(); syncEastInput(); syncLLInput();
@@ -1308,7 +1406,7 @@ function applyLatLon(lat0, lon0){
   setRAField(eastRANow());                // α 与 Ω 联动同步
   setPlaying(false);
   keepViewReadable();
-  syncLabels(); buildOrbit(); syncEastInput(); syncLLInput();
+  syncLabels(); syncEastInput(); syncLLInput();
 }
 
 function syncEastInput(){
@@ -1343,7 +1441,7 @@ function normalizeRAField(){
   if (S.node >= 360) S.node -= 360;
   $('inNode').value = Math.round(S.node);
   setRAField(eastRANow());
-  syncLabels(); buildOrbit(); syncLLInput(); keepViewReadable();
+  syncLabels(); syncLLInput(); keepViewReadable();
 }
 
 /* ================= 交互 ================= */
@@ -1360,11 +1458,11 @@ $('inTsat').addEventListener('input', e => {
   S.tsat = +e.target.value; syncLabels(); syncEastInput();
 });
 $('inNode').addEventListener('input', e => {
-  S.node = +e.target.value; syncLabels(); buildOrbit(); syncLLInput(); keepViewReadable();
+  S.node = +e.target.value; syncLabels(); syncLLInput(); keepViewReadable();
   setRAField(eastRANow());          // 最东点赤经随升交点同步：α = Ω + 90°
 });
 $('inIncl').addEventListener('input', e => {
-  S.incl = +e.target.value; syncLabels(); buildOrbit(); syncEastInput(); syncLLInput(); keepViewReadable();
+  S.incl = +e.target.value; syncLabels(); syncEastInput(); syncLLInput(); keepViewReadable();
 });
 
 /* 自转周期：太阳日 / 恒星日 二选一 */
@@ -1437,19 +1535,23 @@ function setPlaying(v){
 }
 $('btnPlay').addEventListener('click', ()=> setPlaying(true));
 $('btnPause').addEventListener('click', ()=> setPlaying(false));
+/* 三星恢复出厂：参数回 SAT_INIT，可见性只留 E 星，选中 E 星（S 随之回 DEFAULTS） */
+function resetSats(){
+  SATS.forEach((sm,i)=>{ Object.assign(sm, SAT_INIT[i], {show: i===2}); });
+  loadSatToS(2);
+}
 $('btnReset').addEventListener('click', ()=>{
-  S.tsat = DEFAULTS.tsat; S.incl = DEFAULTS.incl; S.node = DEFAULTS.node;
-  S.phase = DEFAULTS.phase; S.t = DEFAULTS.t;
-  S.sunSync = false;                                  // 退出太阳同步
+  resetSats();
+  S.t = DEFAULTS.t;                                   // 时刻回 19:00（lastT 下一帧自动对齐）
   S.rot = 24;                                         // 自转周期回太阳日
   [...$('segRot').children].forEach(x=>x.classList.toggle('on', x.dataset.v === '24'));
   dateBase = new Date(new Date().getFullYear(), 0, 1); // 日期回默认（当年 1 月 1 日）
   syncDateUI(true);
-  $('inTsat').value = S.tsat; $('inIncl').value = S.incl; $('inNode').value = S.node;
-  setRAField(eastRANow());                // 默认 Ω=298 ⇒ α=28.0（与联动规则一致）
+  setRAField(eastRANow());                // 默认 Ω=210 ⇒ α=300.0（与联动规则一致）
   setPlaying(false);
   setDefaultView();                       // 3D 视角也回到默认取景
-  syncLabels(); buildOrbit(); syncEastInput(); syncLLInput();
+  syncLabels(); syncEastInput(); syncLLInput();
+  syncChips();
 });
 window.addEventListener('keydown', ev=>{
   if (ev.code === 'Space'){ ev.preventDefault(); setPlaying(!S.playing); }
@@ -1473,8 +1575,8 @@ gcv.addEventListener('wheel', ev=>{
   view.zoom = clamp(view.zoom * (ev.deltaY>0 ? 0.92 : 1.08), 0.65, 1.7);
 }, {passive:false});
 
-/* ================= 主循环 ================= */
-let last = 0, acc = 0;
+let last = 0;
+let lastT = null;      // 上一帧的 S.t：主循环按 Δt 统一处理所有时间变化（播放/加速/定位跳变）
 function loop(now){
   if (!last) last = now;
   const dt = Math.max(0, Math.min(0.08, (now-last)/1000));   // 时间只前进，绝不回退
@@ -1482,14 +1584,23 @@ function loop(now){
   // 时间倍率：勾选「时间加速」且窗口打开时整页按同一时间基准加速
   // （太阳公转、日期、晨昏线、卫星全部共用 S.t，绝不会各走各的时间）
   const boost = (chkFast.checked && precWin.classList.contains('show')) ? 100 : 1;
-  if (S.playing){
-    const dts = dt*SPEED*boost;
-    S.t += dts;                         // 时间连续推进，卫星周而复始，不会在循环点跳位
-    if (S.sunSync){                     // 太阳同步（风云E星）：dΩ/dt = 太阳惯性赤经变化率
-      const nodeRate = 360/S.rot - 15;  // 太阳日模式=0（Ω 不需进动）；恒星日模式=+0.9856°/天
-      if (nodeRate > 1e-9){
-        S.node = ((S.node + nodeRate*dts) % 360 + 360) % 360;
-        buildOrbit();
+  if (S.playing) S.t += dt*SPEED*boost;    // 时间连续推进，卫星周而复始，不会在循环点跳位
+
+  /* 太阳同步卫星的 Ω 进动：按 Δt 统一处理（选中星经 S，其余星直接改各自参数）。
+     nodeRate = 太阳惯性赤经变化率（°/h）：太阳日模式=0（Ω 不需进动）；恒星日模式≈+0.0411°/h */
+  if (lastT === null) lastT = S.t;
+  const dT = S.t - lastT;
+  lastT = S.t;
+  if (dT !== 0){
+    const nodeRate = 360/S.rot - 15;
+    if (Math.abs(nodeRate) > 1e-12){
+      for (let si=0; si<SATS.length; si++){
+        if (si === cur || !SATS[si].sunSync) continue;
+        const s = SATS[si];
+        s.node = ((s.node + nodeRate*dT) % 360 + 360) % 360;
+      }
+      if (S.sunSync){
+        S.node = ((S.node + nodeRate*dT) % 360 + 360) % 360;
         if (document.activeElement !== $('inNode')){
           $('inNode').value = Math.round(S.node);
           $('vNode').textContent = (Number.isInteger(S.node) ? S.node : S.node.toFixed(1)) + '°';
@@ -1498,13 +1609,14 @@ function loop(now){
       }
     }
   }
+  pushSToSat();                          // 滑块对选中星的修改回写到 SATS[cur]
   syncDateUI();
   const g = drawMapFrame();
   drawGlobe();
   drawPrecWin();
-  // 状态文字
+  // 状态文字（显示选中卫星）
   const nd = nowDate();
-  statusEl.textContent = '北京时间 ' + fmtClock(S.t) +
+  statusEl.textContent = SATS[cur].tag + '  ·  北京时间 ' + fmtClock(S.t) +
     '  ·  ' + (nd.getMonth()+1) + '月' + nd.getDate() + '日' +
     '  ·  第 ' + (Math.floor(S.t/TAU_T())+1) + ' 圈' +
     '  ·  最东 ' + fmtClock(eastClockNow()) +
@@ -1513,24 +1625,99 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 
-/* ================= 预设：风云E星（FY-3E，太阳同步晨昏轨道） ================= */
-/* 真实参数：a≈7231 km、T≈101.6 min、i≈98.75°；地球扁率 J2 使轨道面每天东进 0.9856°，
-   恰与地球绕日公转角速度相同 → 轨道面与太阳方向夹角恒定（恒定地方时，晨昏轨道）。
-   模型内取 T=1.7h、i=98.8°；本模型太阳惯性赤经 = 300° + (360/S.rot − 15)·t（恒星日模式每天东进 0.9856°）。
-   LTAN = 12 + (Ω − 太阳惯性赤经)/15 ⇒ 升交点地方时 06:00 时 Ω = 300° − 90° = 210°。
-   启用 S.sunSync 后 dΩ/dt = 360/S.rot − 15（恒星日下每天 +0.9856°），昼夜分界（晨昏线）恒过轨道升/降交点 */
-$('btnFY').addEventListener('click', ()=>{
-  S.tsat = 1.7;
-  S.incl = 98.8;
-  S.sunSync = true;
-  S.node = 210;
-  S.phase = (((90 - TAU*S.t/TAU_T()/DEG) % 360) + 360) % 360;   // 此刻卫星正位于最东点(u=90°)
-  $('inTsat').value = S.tsat; $('inIncl').value = S.incl; $('inNode').value = S.node;
-  syncLabels(); buildOrbit(); syncEastInput(); syncLLInput();
+/* ================= 预设：风云 C / D / E 三星 ================= */
+/* 真实背景：FY-1C/1D 为太阳同步极轨气象卫星（≈870 km 量级），FY-3E 为太阳同步晨昏轨道。
+   地球扁率 J2 摄动使太阳同步轨道面每天东进 0.9856°，恰与地球公转角速度相同
+   → 过升交点地方时（LTAN）恒定，轨道与昼夜分界的相对关系不变。
+   模型内太阳惯性赤经 αs = 300° + (360/S.rot − 15)·t（小时），LTAN = 12 + (Ω − αs)/15
+   ⇒ 预设按下式反解 Ω = αs + (LTAN − 12)×15：C 星 LTAN 09:00、D 星 15:00、E 星 06:00。
+   三星 LTAN 不同，因此「公转进动」窗口中三条轨道面交线与日地连线的夹角各不相同（颜色对应）。 */
+const PRESETS = [
+  { tsat:1.6, incl:97.4, ltan:9.0,  phOff:120 },   // phOff：沿轨相位错开量，
+  { tsat:1.9, incl:99.5, ltan:15.0, phOff:240 },   // 避免三星（尤其极轨）同时挤在极区
+  { tsat:1.7, incl:98.8, ltan:6.0,  phOff:0  }     // E 星保持「此刻位于最东点」
+];
+/* 本模型的太阳惯性赤经（°）：太阳日模式恒为 300°，恒星日模式每天东进 0.9856° */
+function alphaSunNow(){ return 300 + (360/S.rot - 15)*S.t; }
+
+/* 选中星切换：S 与 SATS[cur] 双向镜像；滑块/定位框始终编辑选中星 */
+function pushSToSat(){
+  const s = SATS[cur];
+  s.tsat = S.tsat; s.incl = S.incl; s.node = S.node; s.phase = S.phase; s.sunSync = S.sunSync;
+}
+function loadSatToS(i){
+  pushSToSat();
+  cur = i;
+  const s = SATS[i];
+  S.tsat = s.tsat; S.incl = s.incl; S.node = s.node; S.phase = s.phase; S.sunSync = s.sunSync;
+  $('inTsat').value = S.tsat; $('inIncl').value = S.incl; $('inNode').value = Math.round(S.node);
   setRAField(eastRANow());
+  syncLabels(); syncEastInput(); syncLLInput();
   keepViewReadable();
+  syncChips();
+}
+
+/* 显示开关 / 预设高亮 / 图例颜色 */
+function syncChips(){
+  document.querySelectorAll('#satRow .chip').forEach(ch=>{
+    const i = +ch.dataset.i, s = SATS[i];
+    ch.classList.toggle('on', s.show);
+    ch.classList.toggle('sel', i === cur);
+    ch.querySelector('i').style.background = s.show ? s.mapCol : '#c4c4ca';
+  });
+  const pm = {btnFYC:0, btnFYD:1, btnFY:2};
+  document.querySelectorAll('.preset .pbtn').forEach(b=>{
+    const i = pm[b.id], P = PRESETS[i], sp = SATS[i];
+    // 只有「选中星」当前参数确实等于该预设时才高亮（避免默认通用轨道被误认为已套用预设）
+    b.classList.toggle('sel', i === cur && P &&
+      Math.abs(sp.tsat - P.tsat) < 1e-6 && Math.abs(sp.incl - P.incl) < 1e-6);
+  });
+  const dot = $('lgDot'), ln = $('lgLine');
+  if (dot) dot.style.background = SATS[cur].mapCol;
+  if (ln) ln.style.background = showOrbits ? SATS[cur].mapCol : '#c8c8cc';
+}
+
+/* 应用某星预设：载入参数 → 定位到当前时刻最东点 → 显示并选中 → 打开进动窗口 */
+function applyPreset(i){
+  const s = SATS[i], P = PRESETS[i];
+  s.tsat = P.tsat; s.incl = P.incl; s.sunSync = true;
+  s.node = ((alphaSunNow() + (P.ltan - 12)*15) % 360 + 360) % 360;
+  s.phase = (((90 + P.phOff - TAU*S.t/tauTs(s)/DEG) % 360) + 360) % 360;  // 在最东点基础上按 phOff 错开
+  SATS.forEach((x,k)=>{ x.show = (k === i); });     // 预设＝该星独立显示（多星同显用下方开关叠加）
+  loadSatToS(i);
+  $('inTsat').value = s.tsat; $('inIncl').value = s.incl; $('inNode').value = Math.round(s.node);
+  setRAField(eastRANow());
+  syncChips();
   openPrecWin();                      // 自动打开“公转进动”演示窗口
+}
+$('btnFYC').addEventListener('click', ()=> applyPreset(0));
+$('btnFYD').addEventListener('click', ()=> applyPreset(1));
+$('btnFY').addEventListener('click',  ()=> applyPreset(2));
+
+/* 卫星显示开关：至少保留一颗可见；点亮的星同时成为选中星 */
+document.querySelectorAll('#satRow .chip').forEach(ch=>{
+  ch.addEventListener('click', ()=>{
+    const i = +ch.dataset.i, s = SATS[i];
+    if (s.show && SATS.filter(x=>x.show).length <= 1) return;   // 至少保留一颗
+    s.show = !s.show;
+    if (s.show) loadSatToS(i);
+    else if (cur === i){
+      const nx = SATS.findIndex(x=>x.show);
+      if (nx >= 0) loadSatToS(nx); else syncChips();
+    } else syncChips();
+  });
 });
+
+/* 「轨道线」开关：只隐藏平面图中的地面轨迹线（卫星位置标记保留） */
+let showOrbits = true;
+$('chkOrb').addEventListener('change', e=>{ showOrbits = e.target.checked; syncChips(); });
+syncChips();
+
+/* 非太阳同步卫星的 J2 摄动结点漂移率（°/天，负值＝西退），进动窗口中展示 */
+function j2Rate(s){
+  const a = 6378.137*Math.cbrt(398600.4418*Math.pow(s.tsat*3600/TAU,2)/Math.pow(6378.137,3));
+  return -9.9640*Math.pow(6378.137/a,3.5)*Math.cos(s.incl*DEG);
+}
 
 /* ================= 浮动窗口：地球公转 · 轨道面进动 ================= */
 const precWin = document.getElementById('precWin');
@@ -1908,16 +2095,27 @@ function drawPrecWin(){
   c.lineTo(ex + ux*(eR+3), ey + uy*(eR+3));
   c.stroke(); c.setLineDash([]);
 
-  /* ---------- 风云E星轨道面与黄道面的交线：过地心、⊥ 日地连线（黄道面内） ---------- */
-  const tW = [Math.cos(pr), 0, -Math.sin(pr)];        // 与日地连线垂直、且躺在黄道面内
-  const tS = pScreen([tW[0], tW[1], tW[2]], 0, 0);    // 方向向量的屏幕增量（原点投影为 0,0）
-  const tLen = Math.hypot(tS[0], tS[1]) || 1;
-  const gnx = tS[0]/tLen, gny = tS[1]/tLen;           // 绿线在屏幕上的单位方向
-  c.strokeStyle = '#8fd48f'; c.lineWidth = 1.6;
-  c.beginPath();
-  c.moveTo(ex + gnx*34*pZoom, ey + gny*34*pZoom);
-  c.lineTo(ex - gnx*34*pZoom, ey - gny*34*pZoom);
-  c.stroke();
+  /* ---------- 各可见卫星的轨道面与黄道面交线：过地心、躺在黄道面内，颜色对应各星 ----------
+     「⊥ 日地连线」是 LTAN 06:00（晨昏轨道）的特殊情形；一般情形下交线与日地连线的夹角
+     由该星的升交点地方时决定：θ = 90° − (Ω − αs)，太阳同步时恒定，非太阳同步时随时间转动 */
+  const aSun = alphaSunNow();                         // 本模型的太阳惯性赤经（°）
+  const satLines = [];
+  for (let si=0; si<SATS.length; si++){
+    const s = SATS[si]; if (!s.show) continue;
+    const th = (90 - (s.node - aSun))*DEG;
+    const ct = Math.cos(th), st = Math.sin(th);
+    const wx = Math.cos(pr)*ct + Math.sin(pr)*st;     // ⊥日地连线方向 (cos pr, −sin pr) 旋转 th
+    const wz = Math.cos(pr)*st - Math.sin(pr)*ct;
+    const tS2 = pScreen([wx, 0, wz], 0, 0);
+    const tL2 = Math.hypot(tS2[0], tS2[1]) || 1;
+    const gx2 = tS2[0]/tL2, gy2 = tS2[1]/tL2;         // 该星交线的屏幕单位方向
+    satLines.push({ s, gx:gx2, gy:gy2, sel: si===cur });
+    c.strokeStyle = s.ringF; c.lineWidth = si===cur ? 1.8 : 1.25;
+    c.beginPath();
+    c.moveTo(ex + gx2*34*pZoom, ey + gy2*34*pZoom);
+    c.lineTo(ex - gx2*34*pZoom, ey - gy2*34*pZoom);
+    c.stroke();
+  }
 
   /* ---------- 「若无进动」：惯性系中固定的 +x 方向（屏幕上水平） ---------- */
   if (Math.abs(ph) > 2){
@@ -1941,7 +2139,8 @@ function drawPrecWin(){
     return m;
   }
   const angSun = Math.atan2(uy, ux);                  // 地球 → 太阳 的屏幕角
-  const angGrn = Math.atan2(gny, gnx);
+  const grnRef = satLines.find(L2=>L2.sel) || satLines[0];
+  const angGrn = grnRef ? Math.atan2(grnRef.gy, grnRef.gx) : angSun + Math.PI/2;
   let ep = null, ebest = -1e9;
   for (let k=0;k<8;k++){
     const a2 = k*Math.PI/4;
@@ -1978,14 +2177,29 @@ function drawPrecWin(){
     c.fillText(s.name, lx2, ly2);
   }
 
+  /* 每颗可见卫星一行：进动速率 + 当前升交点地方时（LTAN = 12 + (Ω − αs)/15） */
+  let rows = '';
+  for (const L2 of satLines){
+    const s = L2.s;
+    const lt = (((12 + (s.node - aSun)/15) % 24) + 24) % 24;
+    const ltM = Math.round(lt%1*60) % 60;
+    const ltTxt = pad2(Math.floor(lt)) + ':' + pad2(ltM);
+    const rate = s.sunSync ? SUN_RATE : j2Rate(s);
+    const rateTxt = rate >= 0
+      ? '东进 <b>' + rate.toFixed(4) + '°/天</b>'
+      : '西退 <b>' + Math.abs(rate).toFixed(4) + '°/天</b>';
+    rows += '<span style="color:' + s.ringF + '">━</span> <span style="color:' + s.ringF +
+            ';font-weight:700">' + s.tag + '</span>　' + rateTxt +
+            '　地方时 <b>' + ltTxt + '</b><br>';
+  }
   precInfo.innerHTML =
-    '<span style="color:#8fd48f">━</span> 实际轨道面　' +
-    '<span style="color:rgba(210,215,225,.7)">┄</span> 若无进动　' +
-    '<span style="color:rgba(165,175,185,.85)">视角 <b>90°</b>·北极上空俯视</span><br>' +
-    '日期 <b>' + dateStr(nowDate()) + '</b>　年内第 <b>' + (yearFrac(nowDate())+1).toFixed(1) + '</b> 天<br>' +
-    '公转 <b>' + thN.toFixed(1) + '°</b>　进动 <b>' + thN.toFixed(1) + '°</b>　直射点 <b>' +
-    Math.abs(subsolarLat()).toFixed(1) + '°' + (subsolarLat()>=0?'N':'S') + '</b><br>' +
-    '每天东进 <b>0.9856°</b>（J2 摄动）＝公转角速度，与日地连线恒成 <b>90°</b>（晨昏轨道）';
+    '日期 <b>' + dateStr(nowDate()) + '</b>　第 <b>' + (yearFrac(nowDate())+1).toFixed(1) +
+    '</b> 天　直射点 <b>' + Math.abs(subsolarLat()).toFixed(1) + '°' +
+    (subsolarLat()>=0?'N':'S') + '</b><br>' +
+    '公转 <b>' + thN.toFixed(1) + '°</b>　视角 <b>90°</b>·北极上空俯视　' +
+    '<span style="color:rgba(210,215,225,.7)">┄</span> 惯性固定<br>' +
+    rows +
+    '太阳同步：J2 摄动使轨道面每天东进 <b>0.9856°</b>＝公转角速度 → 过升交点地方时恒定';
 }
 
 /* ================= 启动 ================= */
@@ -2005,7 +2219,7 @@ try{
   if (hp.has('ra')){
     const R = ((+hp.get('ra') % 360) + 360) % 360;
     S.node = ((((R - relRADeg(eastU())) % 360) + 360) % 360);       // 由最东点赤经反解
-  }   // 未给 node/ra 时沿用 DEFAULTS（Ω=298°）
+  }   // 未给 node/ra 时沿用 DEFAULTS（Ω=210°，风云E星晨昏轨道）
   $('inTsat').value = S.tsat; $('inIncl').value = S.incl;
   $('inNode').value = S.node;
   setRAField(eastRANow());              // α 与 Ω 联动显示（#ra= 参数已在上面反解 Ω）
@@ -2013,7 +2227,7 @@ try{
 
 setDefaultView();
 syncLabels();
-buildOrbit();
+
 resizeAll();
 syncEastInput(); syncLLInput();
 syncDateUI(true);
