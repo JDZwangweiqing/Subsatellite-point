@@ -136,6 +136,61 @@
     position:absolute;right:16px;bottom:14px;font-size:11.5px;color:rgba(255,255,255,.42);
     letter-spacing:.4px;pointer-events:none;user-select:none;
   }
+  #btnPrec{
+    position:absolute;top:10px;right:12px;z-index:6;cursor:pointer;user-select:none;
+    background:rgba(40,42,46,.85);color:#ffd76e;border:1px solid #5a5b60;border-radius:14px;
+    font-size:11.5px;padding:4px 12px;letter-spacing:.4px;
+  }
+  #btnPrec:hover{background:rgba(64,66,72,.9)}
+  /* 浮动窗口挂在 body 上、position:fixed —— 可以拖到左侧平面图区域显示（不受 #right 裁剪） */
+  #precWin{
+    position:fixed;top:40px;right:12px;z-index:80;width:308px;display:none;
+    background:#212327;border:1px solid #56575c;border-radius:10px;
+    box-shadow:0 8px 28px rgba(0,0,0,.45);color:#d7dce3;
+  }
+  #precWin.show{display:block}
+  #precWin .phead{cursor:move;user-select:none;touch-action:none}
+  #precRsz{
+    position:absolute;right:2px;bottom:2px;width:15px;height:15px;cursor:nwse-resize;z-index:3;
+    background:linear-gradient(135deg, transparent 52%, rgba(255,215,110,.55) 52%);
+  }
+  #btnDN{
+    position:absolute;top:6px;right:56px;z-index:4;cursor:pointer;user-select:none;
+    background:#fff;border:1px solid #b9b9c2;border-radius:12px;padding:3px 11px;
+    font-size:11.5px;color:#4a4a4a;letter-spacing:.3px;box-shadow:0 1px 2px rgba(0,0,0,.08);
+    font-family:inherit;
+  }
+  #btnDN:hover{border-color:#7a51e2;color:#5a2ec0}
+  #btnDN.off{color:#9a9aa2;border-color:#d5d5db}
+  .phead{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 5px;font-weight:600;font-size:12.5px;color:#ffd76e;letter-spacing:.3px}
+  .phead button{background:none;border:0;color:#9a9ba0;font-size:17px;line-height:1;cursor:pointer;padding:0 3px}
+  .phead button:hover{color:#fff}
+  #prec{display:block;margin:0 auto}
+  .pinfo{padding:4px 14px 2px;font-size:11.5px;line-height:1.75;color:#c9d0d8}
+  .pinfo b{color:#ffd76e;font-variant-numeric:tabular-nums}
+  .pfoot{display:flex;align-items:center;gap:6px;padding:2px 14px 10px;font-size:11.5px;color:#9a9ba0;user-select:none}
+  .pfoot input{accent-color:#7a51e2}
+
+  .preset{margin:10px 8px 0}
+  .pbtn{
+    width:100%;cursor:pointer;background:#fff;border:1px solid #c9c9cf;border-radius:8px;
+    padding:7px 10px;font-size:12.5px;color:#3a3a3a;letter-spacing:.3px;
+  }
+  .pbtn:hover{border-color:#7a51e2;color:#5a2ec0}
+
+  /* 自转周期二选一 */
+  .seg{display:flex;gap:6px}
+  .segbtn{flex:1;height:24px;border:1px solid #c9c9cf;border-radius:7px;background:#fff;color:#6a6a70;
+    font-family:inherit;font-size:11.5px;letter-spacing:.3px;cursor:pointer;transition:all .15s;
+    white-space:nowrap;padding:0 4px}
+  .segbtn:hover{border-color:#7a51e2;color:#5a2ec0}
+  .segbtn.on{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:600}
+
+  /* 日期行 */
+  .daterow{display:flex;align-items:center;gap:8px;margin:10px 8px 0;white-space:nowrap}
+  input[type="date"]{height:24px;border:1px solid #d5d5d5;border-radius:5px;background:#fafafa;
+    font-family:inherit;font-size:12px;color:#333;padding:0 6px;font-variant-numeric:tabular-nums}
+  .dnote{color:#8c8c8c;font-size:11px;letter-spacing:.2px}
 
   @media (max-width:900px){
     body{overflow:auto}
@@ -155,8 +210,11 @@
     <div id="controls">
       <div class="grid">
         <div class="ctrl">
-          <div class="lab"><span>自转周期</span><span class="val" id="vRot">24 h</span></div>
-          <input id="inRot" type="range" min="1" max="47" step="1" value="24" disabled>
+          <div class="lab"><span title="地球自转一周的时间：太阳日 24 h（相对太阳，决定昼夜节律）／恒星日 23 h 56 m 04 s（相对恒星，地球的真实自转周期）">自转周期</span><span class="val" id="vRot">太阳日 24 h</span></div>
+          <div class="seg" id="segRot">
+            <button class="segbtn on" data-v="24" title="太阳日：24 小时，昼夜节律以它为准">太阳日 24h</button>
+            <button class="segbtn" data-v="23.9344444" title="恒星日：23 小时 56 分 04 秒，地球相对恒星的真实自转周期；比太阳日短，地面轨迹每天西移约 1°">恒星日 23h56m</button>
+          </div>
         </div>
         <div class="ctrl o">
           <div class="lab"><span>卫星周期</span><span class="val" id="vTsat">16.0 h</span></div>
@@ -167,10 +225,19 @@
           <input id="inNode" type="range" class="r-green" min="0" max="360" step="1" value="298" title="拖动时最东点赤经 α 同步变化（α = Ω + 90°）">
         </div>
         <div class="ctrl g">
-          <div class="lab"><span title="轨道倾角 i（°）：0°=赤道轨道，+90°=极地顺行轨道，−90°=极地逆行轨道；|i| 为可达的最大纬度绝对值">轨道倾角</span><span class="val" id="vIncl">36°</span></div>
-          <input id="inIncl" type="range" class="r-green" min="-90" max="90" step="1" value="36">
+          <div class="lab"><span title="轨道倾角 i（°）：0°=赤道轨道，±90°=极地轨道，|i|>90° 为逆行轨道；|i| 为可达的最大纬度绝对值。太阳同步轨道 i≈98.8°">轨道倾角</span><span class="val" id="vIncl">36°</span></div>
+          <input id="inIncl" type="range" class="r-green" min="-180" max="180" step="1" value="36">
         </div>
       </div>
+    </div>
+    <div class="preset">
+      <button id="btnFY" class="pbtn" title="风云三号E星（FY-3E）：我国太阳同步晨昏轨道气象卫星。周期 1.7 h（≈102 min）、倾角 98.8°、升交点地方时 06:00；轨道面每天东进 0.9856° 与地球公转同步，故每天以相同地方时过境。选中后昼夜分布与卫星轨道的相对关系即真实晨昏轨道">预设 · 风云E星（太阳同步轨道）</button>
+    </div>
+
+    <div class="daterow">
+      <span class="lname">日期</span>
+      <input id="inDate" type="date" title="选择日期：太阳直射点纬度（季节）随日期变化，昼夜分布随之改变；日期也随仿真时间自动推进（可在此观察变化）">
+      <span class="dnote" id="vDate">直射点 δ=0.0°N</span>
     </div>
 
     <div id="locate">
@@ -215,7 +282,7 @@
       <span><i class="line"></i>最近 24 小时轨迹</span>
     </div>
 
-    <div id="mapbox"><canvas id="map"></canvas></div>
+    <div id="mapbox"><canvas id="map"></canvas><button id="btnDN" title="显示/隐藏昼夜半球分布（同时作用于平面图与右侧 3D 地球）">昼夜分布：开</button></div>
 
     <div id="bar">
       <div class="btns">
@@ -238,6 +305,14 @@
 
   <section id="right">
     <canvas id="globe"></canvas>
+    <button id="btnPrec" title="显示/隐藏：地球公转时风云E星轨道面进动演示">公转进动</button>
+    <div id="precWin">
+      <div class="phead"><span>地球公转 · 轨道面进动（风云E星）</span><button id="btnPrecClose" title="隐藏窗口">×</button></div>
+      <canvas id="prec"></canvas>
+      <div class="pinfo" id="precInfo"></div>
+      <div class="pfoot"><label><input type="checkbox" id="chkFast"> 时间加速 ×100（整页同步，日期随之变化）</label></div>
+      <div id="precRsz" title="拖动调整窗口大小"></div>
+    </div>
     <div id="hint">拖动旋转视角 · 滚轮缩放</div>
   </section>
 </div>
@@ -392,6 +467,7 @@ const S = {
   node: DEFAULTS.node,     // 升交点赤经 Ω（度）
   incl: DEFAULTS.incl,     // 轨道倾角（度）
   t: DEFAULTS.t,           // 当前时刻（小时，连续递增不回卷）
+  sunSync: false,          // 太阳同步：Ω 每天东进 0.9856°（风云E星预设启用）
   playing: true
 };
 const SPEED = 1.0;       // 每秒推进的仿真小时数
@@ -425,6 +501,22 @@ function fmtClock(t){
   return pad2(Math.floor(x/3600)) + ':' + pad2(Math.floor(x%3600/60)) + ':' + pad2(x%60);
 }
 const gcdInt = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){ const t=a%b; a=b; b=t; } return a; };
+
+/* ================= 太阳直射点（昼夜半球模型） ================= */
+/* 北京时间 = S.t mod 24；直射点经度 λs = 300° − 15°×北京时间（BJ 正午时直射 120°E）
+   直射点纬度（赤纬）由所选日期决定：δ = 23.44°·sin(2π(年内天数−79.5)/365.2422) */
+function subsolarLon(){
+  const bj = ((S.t % 24) + 24) % 24;
+  return (((300 - 15*bj) % 360) + 540) % 360 - 180;
+}
+/* 模型日期：dateBase 为 t=0 对应的日期，随仿真时间自动推进；用户可改选 */
+let dateBase = new Date(new Date().getFullYear(), 0, 1);    // 默认当年 1 月 1 日
+function nowDate(){ return new Date(dateBase.getTime() + S.t*3600000); }
+function yearFrac(d){ return (d - new Date(d.getFullYear(),0,1)) / 86400000; }   // 年内天数（含小数）
+function dateStr(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function subsolarLat(){
+  return 23.44*Math.sin(TAU*(yearFrac(nowDate()) - 79.5)/365.2422);
+}
 
 /* ================= 画布 / 布局 ================= */
 const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -531,6 +623,96 @@ function drawTrail(c){
   c.restore();
 }
 
+/* ================= 昼夜半球显示 ================= */
+let showDN = true;                    // 默认显示昼夜分布（平面图按钮控制）
+
+/* 平面图：逐经度绘制夜半球阴影 + 晨昏线 */
+function drawDayNight(c){
+  if (!showDN) return;
+  const dec = subsolarLat(), sl = subsolarLon();
+  const tanDec = Math.tan(dec*DEG);
+  const nearEq = Math.abs(tanDec) < 1e-4;
+  c.save();
+  c.beginPath(); c.rect(L.x0, L.y0, L.w, L.h); c.clip();
+
+  // 夜面阴影：整块路径一次性填充，避免逐列叠加出现竖条纹
+  const termLat = lon => Math.atan(-Math.cos((((lon - sl + 540) % 360) - 180)*DEG)/tanDec)/DEG;
+  c.fillStyle = 'rgba(23,32,68,.30)';
+  c.beginPath();
+  if (nearEq){
+    const a = ((sl + 90 + 540) % 360) - 180;         // 夜区起始经度
+    const b = ((sl + 270 + 540) % 360) - 180;        // 夜区结束经度
+    if (a < b) c.rect(X(a), L.y0, X(b)-X(a), L.h);
+    else {
+      c.rect(L.x0, L.y0, X(b)-L.x0, L.h);
+      c.rect(X(a), L.y0, L.x0+L.w-X(a), L.h);
+    }
+  } else {
+    for (let k=0; k<=180; k++){
+      const lon = -180 + 2*k;
+      const x = X(lon), y = Y(termLat(lon));
+      if (k===0) c.moveTo(x,y); else c.lineTo(x,y);
+    }
+    if (dec > 0){ c.lineTo(L.x0+L.w, L.y0+L.h); c.lineTo(L.x0, L.y0+L.h); }
+    else        { c.lineTo(L.x0+L.w, L.y0);     c.lineTo(L.x0, L.y0); }
+    c.closePath();
+  }
+  c.fill();
+
+  // 晨昏线
+  c.strokeStyle = 'rgba(70,90,160,.85)'; c.lineWidth = 1.2;
+  if (nearEq){
+    c.beginPath();
+    for (const lm of [sl-90, sl+90]){
+      const x = X(lm);
+      c.moveTo(x, L.y0); c.lineTo(x, L.y0+L.h);
+    }
+    c.stroke();
+  } else {
+    c.beginPath();
+    for (let k=0; k<=180; k++){
+      const lon = -180 + 2*k;
+      const x = X(lon), y = Y(termLat(lon));
+      if (k===0) c.moveTo(x,y); else c.lineTo(x,y);
+    }
+    c.stroke();
+  }
+
+  c.restore();
+}
+
+/* 太阳直射点标记：日期决定它的纬度，晨昏圈即围着它倾斜（画在轨迹之上，不被红线压住） */
+function drawSubsolar(c){
+  if (!showDN) return;
+  const dec = subsolarLat(), sl = subsolarLon();
+  c.save();
+  c.beginPath(); c.rect(L.x0, L.y0, L.w, L.h); c.clip();
+  const sx = X(sl), sy = Y(dec);
+  c.fillStyle = 'rgba(255,206,84,.18)';
+  c.beginPath(); c.arc(sx,sy,10,0,TAU); c.fill();
+  c.strokeStyle = 'rgba(255,200,70,.9)'; c.lineWidth = 1.4;
+  for (let k=0; k<8; k++){
+    const a = k*TAU/8 + 0.2;
+    c.beginPath();
+    c.moveTo(sx+Math.cos(a)*5.4, sy+Math.sin(a)*5.4);
+    c.lineTo(sx+Math.cos(a)*8.2, sy+Math.sin(a)*8.2);
+    c.stroke();
+  }
+  c.beginPath(); c.arc(sx,sy,3.4,0,TAU);
+  c.fillStyle = '#ffcf55'; c.fill();
+  c.strokeStyle = 'rgba(255,246,214,.9)'; c.lineWidth = 1; c.stroke();
+  const dnLab = '直射点 δ=' + Math.abs(dec).toFixed(1) + '°' + (dec>=0?'N':'S');
+  c.font = '10.5px "Segoe UI","Microsoft YaHei",sans-serif';
+  const lw = c.measureText(dnLab).width;
+  const toLeft = (sx + 14 + lw > L.x0 + L.w);
+  c.textAlign = toLeft ? 'right' : 'left'; c.textBaseline = 'middle';
+  const lx = toLeft ? sx - 13 : sx + 13, ly = Math.min(L.y0+L.h-6, Math.max(L.y0+6, sy));
+  c.lineWidth = 2.6; c.strokeStyle = 'rgba(255,255,255,.82)';
+  c.strokeText(dnLab, lx, ly);
+  c.fillStyle = '#d99b1a'; c.fillText(dnLab, lx, ly);
+  c.restore();
+}
+
 /* ================= 地图帧绘制 ================= */
 function drawMapFrame(){
   ctx.setTransform(1,0,0,1,0,0);
@@ -538,7 +720,9 @@ function drawMapFrame(){
   ctx.drawImage(stat,0,0);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
+  drawDayNight(ctx);
   drawTrail(ctx);
+  drawSubsolar(ctx);
 
   // 本圈最东点（取已发生过的那一个，保证落在轨迹线上）
   const uCur = TAU*S.t/TAU_T() + S.phase*DEG;
@@ -681,10 +865,16 @@ function drawGlobe(){
   }
 
   /* ---------- 球体 ---------- */
-  const grd = c.createRadialGradient(cx-R*0.38, cy-R*0.42, R*0.03, cx, cy, R*1.03);
-  grd.addColorStop(0,'#e8f3ff');
-  grd.addColorStop(0.30,'#bcd8f0');
-  grd.addColorStop(0.68,'#7ea6cc');
+  // 太阳方向：同时用于球面高光位置与夜面阴影（光照一致）
+  const sunD = showDN ? latLonDirs([subsolarLat()],[subsolarLon()],theta)[0] : null;
+  const hsx = sunD ? dot3(sunD, camR) : -0.9;
+  const hsy = sunD ? dot3(sunD, camU) : 0.9;
+  const hn  = Math.hypot(hsx,hsy) || 1;
+  const grd = c.createRadialGradient(
+    cx + R*0.34*(hsx/hn), cy - R*0.38*(hsy/hn), R*0.03, cx, cy, R*1.03);
+  grd.addColorStop(0,'#eaf4ff');
+  grd.addColorStop(0.30,'#c3dcf2');
+  grd.addColorStop(0.68,'#82a9ce');
   grd.addColorStop(1,'#43678f');
   c.beginPath(); c.arc(cx,cy,R,0,TAU); c.fillStyle = grd; c.fill();
 
@@ -714,6 +904,83 @@ function drawGlobe(){
     const lats = new Array(n), lons = new Array(n);
     for (let i=0;i<n;i++){ lons[i]=ring[i*2]; lats[i]=ring[i*2+1]; }
     strokeDirs(latLonDirs(lats,lons,theta), 1, true, '#20539f', 1.1, 1);
+  }
+
+  /* ---------- 昼夜半球（夜面阴影 + 晨昏线） ---------- */
+  if (showDN && sunD){
+    const dc = dot3(camD, sunD);
+    const NIGHT = 'rgba(9,14,34,.42)';
+    c.save();
+    if (dc <= -0.999){                       // 太阳在正后方：整个可见面为夜
+      c.beginPath(); c.arc(cx,cy,R,0,TAU);
+      c.fillStyle = NIGHT; c.fill();
+    } else if (dc < 0.999){
+      const Nv = cross3(camD, sunD);
+      if (Math.hypot(Nv[0],Nv[1],Nv[2]) > 1e-9){
+        const A = norm3(cross3(sunD, Nv));
+        const B = cross3(sunD, A);
+        const M = 72;
+        // 晨昏线的正面弧（pd>=0 的半圆，从 aP−π/2 到 aP+π/2）
+        const aP = Math.atan2(dot3(B,camD), dot3(A,camD));
+        const tPts = [];
+        for (let k=0; k<=M; k++){
+          const a = aP - Math.PI/2 + Math.PI*k/M;
+          tPts.push([Math.cos(a)*A[0]+Math.sin(a)*B[0],
+                     Math.cos(a)*A[1]+Math.sin(a)*B[1],
+                     Math.cos(a)*A[2]+Math.sin(a)*B[2]]);
+        }
+        // 轮廓线上夜侧的半弧（与太阳方向夹角 < 90°）
+        const psiM = Math.atan2(dot3(camU,sunD), dot3(camR,sunD));
+        const lPts = [];
+        for (let k=0; k<=M; k++){
+          const psi = psiM + Math.PI/2 + Math.PI*k/M;
+          lPts.push([Math.cos(psi)*camR[0]+Math.sin(psi)*camU[0],
+                     Math.cos(psi)*camR[1]+Math.sin(psi)*camU[1],
+                     Math.cos(psi)*camR[2]+Math.sin(psi)*camU[2]]);
+        }
+        // 匹配晨昏线末端与轮廓线端点（两者均为 ±(camD×sunD) 方向）
+        const tEnd = tPts[tPts.length-1];
+        const d0 = (lPts[0][0]-tEnd[0])**2 + (lPts[0][1]-tEnd[1])**2 + (lPts[0][2]-tEnd[2])**2;
+        const d1 = (lPts[M][0]-tEnd[0])**2 + (lPts[M][1]-tEnd[1])**2 + (lPts[M][2]-tEnd[2])**2;
+        const limb = d0 <= d1 ? lPts : lPts.slice().reverse();
+        // 夜面 = 晨昏线正面弧 + 轮廓夜侧弧 围成的区域
+        c.beginPath();
+        tPts.concat(limb).forEach((p,kk)=>{
+          const x = px(p,1), y = py(p,1);
+          if (kk) c.lineTo(x,y); else c.moveTo(x,y);
+        });
+        c.closePath();
+        c.fillStyle = NIGHT; c.fill();
+        // 晨昏线
+        c.beginPath();
+        tPts.forEach((p,kk)=>{
+          const x = px(p,1), y = py(p,1);
+          if (kk) c.lineTo(x,y); else c.moveTo(x,y);
+        });
+        c.strokeStyle = 'rgba(255,232,160,.5)'; c.lineWidth = 1.2;
+        c.stroke();
+      }
+    }
+    c.restore();
+  }
+
+  /* ---------- 太阳直射点标记（日期决定其纬度，晨昏圈随之倾斜） ---------- */
+  if (showDN && sunD && dot3(camD, sunD) > 0.06){
+    const sx = px(sunD,1), sy = py(sunD,1);
+    c.save();
+    const sg2 = c.createRadialGradient(sx,sy,1, sx,sy,13);
+    sg2.addColorStop(0,'rgba(255,248,200,.95)');
+    sg2.addColorStop(0.36,'rgba(255,206,80,.55)');
+    sg2.addColorStop(1,'rgba(255,190,60,0)');
+    c.fillStyle = sg2; c.beginPath(); c.arc(sx,sy,13,0,TAU); c.fill();
+    c.beginPath(); c.arc(sx,sy,3.2,0,TAU); c.fillStyle = '#fff6cf'; c.fill();
+    c.font = 'italic 11px "Segoe UI","Microsoft YaHei",sans-serif';
+    c.textAlign = 'left'; c.textBaseline = 'middle';
+    c.lineWidth = 2.6; c.strokeStyle = 'rgba(12,24,44,.75)';
+    c.strokeText('直射点', sx+11, sy-12);
+    c.fillStyle = '#ffeeb4';
+    c.fillText('直射点', sx+11, sy-12);
+    c.restore();
   }
 
   /* ---------- 轨道环（正面） ---------- */
@@ -971,7 +1238,7 @@ function dayLapPeriod(){
 
 /* 定位到“最东点时刻（北京时间）” */
 function applyEastClock(C){
-  const T = TAU_T();
+  const T = TAU_T(), t0 = S.t;
   C = ((C % 24) + 24) % 24;
   // 找一个圈次，使该次最东点正好落在钟点 C：tE = (C - k·T) 落在 [0,T)
   let tE = null, k = 0;
@@ -989,6 +1256,12 @@ function applyEastClock(C){
   S.t = tE + k*T;
   const Lp = dayLapPeriod();
   for (let g=0; g<20 && S.t < TRAIL_H - 1e-9 && Lp <= 240; g++) S.t += Lp;   // 补足 24h 轨迹
+
+  if (S.sunSync && S.t !== t0){
+    S.node = ((S.node + (360/S.rot - 15)*(S.t - t0)) % 360 + 360) % 360;  // 太阳同步：Ω 随太阳惯性赤进
+    $('inNode').value = Math.round(S.node);
+    setRAField(eastRANow());
+  }
 
   setPlaying(false);
   syncLabels(); syncEastInput(); syncLLInput();
@@ -1080,7 +1353,7 @@ function syncLabels(){
   $('vTsat').textContent  = S.tsat.toFixed(1) + ' h';
   $('vNode').textContent  = (Number.isInteger(S.node) ? S.node : (+S.node).toFixed(1)) + '°';
   $('vIncl').textContent  = S.incl + '°';
-  $('vRot').textContent   = '24 h';
+  $('vRot').textContent   = Math.abs(S.rot - 24) < 1e-6 ? '太阳日 24 h' : '恒星日 23h56m';
 }
 
 $('inTsat').addEventListener('input', e => {
@@ -1092,6 +1365,33 @@ $('inNode').addEventListener('input', e => {
 });
 $('inIncl').addEventListener('input', e => {
   S.incl = +e.target.value; syncLabels(); buildOrbit(); syncEastInput(); syncLLInput(); keepViewReadable();
+});
+
+/* 自转周期：太阳日 / 恒星日 二选一 */
+$('segRot').addEventListener('click', e=>{
+  const b = e.target.closest('.segbtn'); if (!b) return;
+  S.rot = +b.dataset.v;
+  [...$('segRot').children].forEach(x=>x.classList.toggle('on', x === b));
+  syncLabels();
+});
+
+/* 日期选择：改的是“当前时刻”的日期，日期随仿真时间继续推进 */
+function syncDateUI(force){
+  const el = $('inDate');
+  if (document.activeElement !== el){
+    const v = dateStr(nowDate());
+    if (force || el.value !== v) el.value = v;
+  }
+  const d = subsolarLat();
+  $('vDate').textContent = '直射点 δ=' + Math.abs(d).toFixed(1) + '°' + (d>=0?'N':'S');
+}
+$('inDate').addEventListener('change', e=>{
+  const p = String(e.target.value || '').split('-').map(Number);
+  if (p.length === 3 && p.every(isFinite)){
+    const d0 = new Date(p[0], p[1]-1, p[2], 0, 0, 0);
+    dateBase = new Date(d0.getTime() - S.t*3600000);
+  }
+  syncDateUI(true);
 });
 
 $('btnEast').addEventListener('click', ()=>{
@@ -1140,6 +1440,11 @@ $('btnPause').addEventListener('click', ()=> setPlaying(false));
 $('btnReset').addEventListener('click', ()=>{
   S.tsat = DEFAULTS.tsat; S.incl = DEFAULTS.incl; S.node = DEFAULTS.node;
   S.phase = DEFAULTS.phase; S.t = DEFAULTS.t;
+  S.sunSync = false;                                  // 退出太阳同步
+  S.rot = 24;                                         // 自转周期回太阳日
+  [...$('segRot').children].forEach(x=>x.classList.toggle('on', x.dataset.v === '24'));
+  dateBase = new Date(new Date().getFullYear(), 0, 1); // 日期回默认（当年 1 月 1 日）
+  syncDateUI(true);
   $('inTsat').value = S.tsat; $('inIncl').value = S.incl; $('inNode').value = S.node;
   setRAField(eastRANow());                // 默认 Ω=298 ⇒ α=28.0（与联动规则一致）
   setPlaying(false);
@@ -1172,15 +1477,35 @@ gcv.addEventListener('wheel', ev=>{
 let last = 0, acc = 0;
 function loop(now){
   if (!last) last = now;
-  const dt = Math.min(0.08, (now-last)/1000);
+  const dt = Math.max(0, Math.min(0.08, (now-last)/1000));   // 时间只前进，绝不回退
   last = now;
+  // 时间倍率：勾选「时间加速」且窗口打开时整页按同一时间基准加速
+  // （太阳公转、日期、晨昏线、卫星全部共用 S.t，绝不会各走各的时间）
+  const boost = (chkFast.checked && precWin.classList.contains('show')) ? 100 : 1;
   if (S.playing){
-    S.t += dt*SPEED;                    // 时间连续推进，卫星周而复始，不会在循环点跳位
+    const dts = dt*SPEED*boost;
+    S.t += dts;                         // 时间连续推进，卫星周而复始，不会在循环点跳位
+    if (S.sunSync){                     // 太阳同步（风云E星）：dΩ/dt = 太阳惯性赤经变化率
+      const nodeRate = 360/S.rot - 15;  // 太阳日模式=0（Ω 不需进动）；恒星日模式=+0.9856°/天
+      if (nodeRate > 1e-9){
+        S.node = ((S.node + nodeRate*dts) % 360 + 360) % 360;
+        buildOrbit();
+        if (document.activeElement !== $('inNode')){
+          $('inNode').value = Math.round(S.node);
+          $('vNode').textContent = (Number.isInteger(S.node) ? S.node : S.node.toFixed(1)) + '°';
+        }
+        if (document.activeElement !== $('inRA')) setRAField(eastRANow());
+      }
+    }
   }
+  syncDateUI();
   const g = drawMapFrame();
   drawGlobe();
+  drawPrecWin();
   // 状态文字
+  const nd = nowDate();
   statusEl.textContent = '北京时间 ' + fmtClock(S.t) +
+    '  ·  ' + (nd.getMonth()+1) + '月' + nd.getDate() + '日' +
     '  ·  第 ' + (Math.floor(S.t/TAU_T())+1) + ' 圈' +
     '  ·  最东 ' + fmtClock(eastClockNow()) +
     '  ·  星下点 ' + Math.abs(g.lat).toFixed(1) + '°' + (g.lat>=0?'N':'S') +
@@ -1188,15 +1513,494 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 
+/* ================= 预设：风云E星（FY-3E，太阳同步晨昏轨道） ================= */
+/* 真实参数：a≈7231 km、T≈101.6 min、i≈98.75°；地球扁率 J2 使轨道面每天东进 0.9856°，
+   恰与地球绕日公转角速度相同 → 轨道面与太阳方向夹角恒定（恒定地方时，晨昏轨道）。
+   模型内取 T=1.7h、i=98.8°；本模型太阳惯性赤经 = 300° + (360/S.rot − 15)·t（恒星日模式每天东进 0.9856°）。
+   LTAN = 12 + (Ω − 太阳惯性赤经)/15 ⇒ 升交点地方时 06:00 时 Ω = 300° − 90° = 210°。
+   启用 S.sunSync 后 dΩ/dt = 360/S.rot − 15（恒星日下每天 +0.9856°），昼夜分界（晨昏线）恒过轨道升/降交点 */
+$('btnFY').addEventListener('click', ()=>{
+  S.tsat = 1.7;
+  S.incl = 98.8;
+  S.sunSync = true;
+  S.node = 210;
+  S.phase = (((90 - TAU*S.t/TAU_T()/DEG) % 360) + 360) % 360;   // 此刻卫星正位于最东点(u=90°)
+  $('inTsat').value = S.tsat; $('inIncl').value = S.incl; $('inNode').value = S.node;
+  syncLabels(); buildOrbit(); syncEastInput(); syncLLInput();
+  setRAField(eastRANow());
+  keepViewReadable();
+  openPrecWin();                      // 自动打开“公转进动”演示窗口
+});
+
+/* ================= 浮动窗口：地球公转 · 轨道面进动 ================= */
+const precWin = document.getElementById('precWin');
+const precInfo = document.getElementById('precInfo');
+const chkFast = document.getElementById('chkFast');
+/* 窗口挂到 body 下：position:fixed 定位，可自由拖到左侧平面图/任意位置显示，
+   不再被 #right 的 overflow:hidden 裁剪，也不受 3D 面板尺寸限制 */
+document.body.appendChild(precWin);
+const pcv = document.getElementById('prec'), pctx = pcv.getContext('2d');
+const PC_W = 284, PC_H = 200;
+const dpr2 = Math.min(2, window.devicePixelRatio || 1);
+pcv.width = PC_W*dpr2; pcv.height = PC_H*dpr2;
+pcv.style.width = PC_W+'px'; pcv.style.height = PC_H+'px';
+const SUN_RATE = 0.9856;              // 地球公转角速度（°/天）＝太阳同步轨道面的进动速率
+const SUN_EPOCH = new Date(2020,0,1).getTime();
+/* 四季方位（北半球）：视角固定为「北极上空垂直俯视黄道面」，
+   于是屏幕 上=春分、左=夏至、下=秋分、右=冬至，地球沿屏幕逆时针公转。
+   相位零点取「春分」当天的公转角；此后地球沿逆时针方向公转（从黄道面北侧俯视，与常识一致），
+   于是节气当天地球正好落在对应刻度上 —— 日期、晨昏线、进动三者始终自洽
+   数组按时间顺序排列：春分 → 夏至 → 秋分 → 冬至（ph = 自春分起逆时针转过的公转角） */
+const TH_SPRING = SUN_RATE * ((new Date(2020,2,20,12).getTime() - SUN_EPOCH)/86400000);
+const SEASONS = [{name:'春分', ph:0}, {name:'夏至', ph:90}, {name:'秋分', ph:180}, {name:'冬至', ph:270}];
+
+/* ===== 窗口内的 3D 场景：相机在黄道面正上方（北极方向）垂直俯视 =====
+   世界坐标：x 向右、y 指向黄道北、z 指向观察者；黄道面 = y=0 平面
+   秋分点在地球轨道的 +z 端（屏幕下方），春分点在最远的 -z 端（屏幕上方） */
+const VIEW_EL0 = 90*DEG;                                  // 视角高度：90° = 正俯视（北天极方向）
+const ORB_R = 86;                                         // 公转轨道半径（逻辑像素）
+let viewAz = 0;                                           // 水平方位角（0 = 春分在上、秋分在下）
+let viewEl = VIEW_EL0;                                    // 视角高度（固定，不接受鼠标调整）
+const SEASON_OFF = 26;                                    // 节气刻度文字外推距离（逻辑像素，未缩放）
+let pZoom = 1;                                            // 场景整体缩放（俯视时按画布高度自动缩小）
+let pFlat = 1;                                            // |sin 视角高度|：1=正俯视，0=几乎与轨道面共面
+let pvD = [0,0,1], pvR = [1,0,0], pvU = [0,1,0];          // 相机基（每帧由下面重算）
+function updateViewBasis(){
+  const ce = Math.cos(viewEl), se = Math.sin(viewEl);
+  const ca = Math.cos(viewAz), sa = Math.sin(viewAz);
+  pvD = [ sa*ce, se, ca*ce ];                              // 场景 → 相机
+  pvR = [ ca, 0, -sa ];                                    // 屏幕向右
+  pvU = [ -sa*se, ce, -ca*se ];                            // 屏幕向上
+  pFlat = Math.abs(se);
+  /* 轨道投影是半轴 a=ORB_R·pZoom（横向）、b=a·|sin 视角高度|（纵向）的椭圆。
+     纵向/横向都留出 SEASON_OFF 外推的节气文字位置，取更紧的一侧整体缩放，保证连同文字不出画 */
+  pZoom = Math.min(1,
+    (PC_H/2 - 16) / (ORB_R*pFlat + SEASON_OFF),
+    (PC_W/2 - 30) / (ORB_R + SEASON_OFF));
+}
+updateViewBasis();
+
+/* 世界坐标（单位＝逻辑像素，也用于方向向量）→ 屏幕坐标（正交投影） */
+function pScreen(P, cx, cy){
+  return [cx + pZoom*(P[0]*pvR[0] + P[1]*pvR[1] + P[2]*pvR[2]),
+          cy - pZoom*(P[0]*pvU[0] + P[1]*pvU[1] + P[2]*pvU[2])];
+}
+/* 公转角 pr（弧度，自春分起逆时针）处、半径 r 的轨道点：
+   春分 pr=0 在 -z（远）、夏至 pr=90° 在 -x（左）、秋分 pr=180° 在 +z（近）、冬至 pr=270° 在 +x（右） */
+function orbPos(pr, r){ return [-r*Math.sin(pr), 0, -r*Math.cos(pr)]; }
+/* 连续天数（跨年不回卷）：窗口里的太阳位置、公转角全部由它算，
+   而它直接取自 nowDate() —— 即窗口与日期共用同一个时间基准 */
+function sunDay(){ return (nowDate().getTime() - SUN_EPOCH)/86400000; }
+
+function openPrecWin(){ precWin.classList.add('show'); }
+$('btnPrec').addEventListener('click', ()=>{
+  precWin.classList.toggle('show');
+});
+$('btnPrecClose').addEventListener('click', ()=> precWin.classList.remove('show'));
+
+/* 窗口缩放：内部坐标系恒为 PC_W×PC_H，按 precScale 放大渲染（矢量清晰不模糊） */
+let precScale = 1;
+function applyPrecSize(){
+  const w = Math.round(PC_W*precScale), h = Math.round(PC_H*precScale);
+  pcv.width = Math.round(w*dpr2); pcv.height = Math.round(h*dpr2);
+  pcv.style.width = w+'px'; pcv.style.height = h+'px';
+}
+/* 标题栏拖动窗口 / 右下角手柄缩放（窗口在 body 上，可拖到任意位置：3D 区、平面图区都能正常显示） */
+(function(){
+  const head = precWin.querySelector('.phead');
+  function begin(ev){
+    const r = precWin.getBoundingClientRect();          // fixed 定位 → 直接就是视口坐标
+    return { sx: ev.clientX, sy: ev.clientY,
+             ox: r.left, oy: r.top, s0: precScale };
+  }
+  function keepInside(){                                 // 保证整窗留在视口内
+    if (!precWin.style.left) return;
+    const w = precWin.offsetWidth, h = precWin.offsetHeight;
+    precWin.style.left = clamp(parseFloat(precWin.style.left), 0, Math.max(0, window.innerWidth  - w)) + 'px';
+    precWin.style.top  = clamp(parseFloat(precWin.style.top ), 0, Math.max(0, window.innerHeight - h)) + 'px';
+  }
+  function dockHome(){                                   // 双击标题栏：回到 3D 面板右上角
+    precWin.style.left = 'auto'; precWin.style.top = ''; precWin.style.right = '12px';
+  }
+  function bindMove(up2, move){
+    const mv = e=>{ move(e); };
+    const up = ()=>{ document.body.style.cursor='';
+      document.removeEventListener('pointermove', mv);
+      document.removeEventListener('pointerup', up); up2(); };
+    document.addEventListener('pointermove', mv);
+    document.addEventListener('pointerup', up);
+  }
+  head.addEventListener('pointerdown', ev=>{
+    if (ev.target.tagName === 'BUTTON') return;
+    const st = begin(ev);
+    precWin.style.right = 'auto';
+    precWin.style.left = st.ox+'px'; precWin.style.top = st.oy+'px';
+    document.body.style.cursor = 'move';
+    bindMove(()=>{}, e=>{
+      const w = precWin.offsetWidth, h = precWin.offsetHeight;
+      precWin.style.left = clamp(st.ox + e.clientX - st.sx, 0, Math.max(0, window.innerWidth  - w)) + 'px';
+      precWin.style.top  = clamp(st.oy + e.clientY - st.sy, 0, Math.max(0, window.innerHeight - h)) + 'px';
+    });
+    ev.preventDefault();
+  });
+  head.addEventListener('dblclick', ev=>{
+    if (ev.target.tagName === 'BUTTON') return;
+    dockHome();
+  });
+  $('precRsz').addEventListener('pointerdown', ev=>{
+    const st = begin(ev);
+    document.body.style.cursor = 'nwse-resize';
+    bindMove(()=>{}, e=>{
+      precScale = clamp(st.s0 + (e.clientX - st.sx)/PC_W, 0.75, 2.4);
+      precWin.style.width = Math.round(PC_W*precScale + 24) + 'px';
+      applyPrecSize();
+      keepInside();                                       // 放大后若超出右/下边界，自动拉回可视范围
+    });
+    ev.preventDefault();
+  });
+  window.addEventListener('resize', keepInside);
+})();
+
+/* 视角固定为「北极上空俯视」标准取景：不支持鼠标旋转 ——
+   这样节气方位（上春分 / 下秋分 / 左夏至 / 右冬至）与地理常识始终一一对应，
+   在画面上拖动也不会误改视角。窗口自身的拖动/缩放仍由标题栏与右下角手柄处理。 */
+pcv.style.touchAction = 'auto';
+pcv.style.cursor = 'default';
+pcv.title = '北极上空俯视黄道面：上=春分、下=秋分、左=夏至、右=冬至';
+
+/* 浮动窗口里的 3D 地球：与主 3D 地球同一套模型
+   （海面径向渐变 + 细经纬网 + 海岸线 + 昼夜月牙 + 直射点），只是半径小很多。
+   地轴在惯性系中固定指向 n=(sin23.44°, cos23.44°, 0)：北极永远偏向屏幕右侧，
+   所以地球跑到太阳左边（夏至）时北极朝太阳、跑到右边（冬至）时背对太阳 —— 四季由此而来。 */
+function drawPrecGlobe(c, gx, gy, gR, sunD, spinDeg){
+  const EPS = 23.44*DEG;
+  const n  = [Math.sin(EPS), Math.cos(EPS), 0];           // 地轴（指向北极）
+  const Xw = [1,0,0];
+  const a1 = norm3([Xw[0]-n[0]*dot3(Xw,n), Xw[1]-n[1]*dot3(Xw,n), Xw[2]-n[2]*dot3(Xw,n)]);
+  const a2 = cross3(n, a1);
+  const sp = spinDeg*DEG;
+  const dir = (lat, lon)=>{
+    const ca = Math.cos(lat*DEG), sa = Math.sin(lat*DEG);
+    const co = Math.cos(lon*DEG + sp), so = Math.sin(lon*DEG + sp);
+    return [ ca*co*a1[0] + ca*so*a2[0] + sa*n[0],
+             ca*co*a1[1] + ca*so*a2[1] + sa*n[1],
+             ca*co*a1[2] + ca*so*a2[2] + sa*n[2] ];
+  };
+  // 单位方向 → 球面屏幕坐标（正交投影，第三分量 >0 表示朝向观察者）
+  const pj = p => [ gx + gR*(p[0]*pvR[0] + p[1]*pvR[1] + p[2]*pvR[2]),
+                    gy - gR*(p[0]*pvU[0] + p[1]*pvU[1] + p[2]*pvU[2]),
+                    dot3(p, pvD) ];
+  // 只画朝向观察者的一段（在地平线处精确截断），与主 3D 的 strokeDirs 同一套做法
+  function strokeDirs(pts, color, lw){
+    c.strokeStyle = color; c.lineWidth = lw; c.lineCap = 'round'; c.lineJoin = 'round';
+    c.beginPath();
+    let pp = null, pv = false;
+    for (let i=0;i<pts.length;i++){
+      const q = pj(pts[i]), v = q[2] >= 0;
+      if (v){
+        if (!pp || !pv){
+          if (pp && !pv){
+            const f = pp[2]/(pp[2]-q[2]);
+            c.moveTo(pp[0]+(q[0]-pp[0])*f, pp[1]+(q[1]-pp[1])*f);
+            c.lineTo(q[0], q[1]);
+          } else c.moveTo(q[0], q[1]);
+        } else c.lineTo(q[0], q[1]);
+      } else if (pp && pv){
+        const f = pp[2]/(pp[2]-q[2]);
+        c.lineTo(pp[0]+(q[0]-pp[0])*f, pp[1]+(q[1]-pp[1])*f);
+      }
+      pp = q; pv = v;
+    }
+    c.stroke();
+  }
+
+  // ---- 海面：受光点朝太阳那一侧（与主 3D 相同的四段渐变） ----
+  const hsx = dot3(sunD, pvR), hsy = dot3(sunD, pvU);
+  const hn  = Math.hypot(hsx, hsy) || 1;
+  const grd = c.createRadialGradient(
+    gx + gR*0.34*(hsx/hn), gy - gR*0.38*(hsy/hn), gR*0.03, gx, gy, gR*1.03);
+  grd.addColorStop(0,'#eef7ff');
+  grd.addColorStop(0.30,'#c6dff4');
+  grd.addColorStop(0.68,'#88b0d4');
+  grd.addColorStop(1,'#4a7095');
+  c.beginPath(); c.arc(gx, gy, gR, 0, TAU); c.fillStyle = grd; c.fill();
+
+  c.save();
+  c.beginPath(); c.arc(gx, gy, gR, 0, TAU); c.clip();
+
+  // ---- 经纬网（正面；线细，小图上不喧宾夺主） ----
+  for (let lat=-60; lat<=60; lat+=30){
+    const pts = []; for (let lon=-180; lon<=180; lon+=6) pts.push(dir(lat, lon));
+    strokeDirs(pts, 'rgba(20,44,92,.45)', 0.45);
+  }
+  for (let lon=-180; lon<180; lon+=45){
+    const pts = []; for (let lat=-90; lat<=90; lat+=5) pts.push(dir(lat, lon));
+    strokeDirs(pts, 'rgba(20,44,92,.38)', 0.45);
+  }
+
+  // ---- 海岸线（世界地图数据，与主 3D 地球同一份；球小，隔点取样） ----
+  for (let r=0; r<WORLD.length; r++){
+    const ring = WORLD[r], nn = ring.length/2;
+    const step = nn > 240 ? 3 : (nn > 90 ? 2 : 1);
+    const pts = [];
+    for (let i=0;i<nn;i+=step) pts.push(dir(ring[i*2+1], ring[i*2]));
+    if (nn > 1) pts.push(dir(ring[1], ring[0]));          // 补上闭合点
+    strokeDirs(pts, 'rgba(28,66,132,.92)', 0.42);
+  }
+
+  // ---- 昼夜：夜面用「晨昏线正面弧 + 球缘夜侧弧」围成的月牙覆盖 ----
+  const NIGHT = 'rgba(9,14,34,.55)';
+  if (showDN){
+    const dc = dot3(pvD, sunD);
+    if (dc <= -0.999){
+      c.beginPath(); c.arc(gx, gy, gR, 0, TAU); c.fillStyle = NIGHT; c.fill();
+    } else if (dc < 0.999){
+      const Nv = cross3(pvD, sunD);
+      if (Math.hypot(Nv[0],Nv[1],Nv[2]) > 1e-9){
+        const A = norm3(cross3(sunD, Nv)), B = cross3(sunD, A);
+        const M = 48, tPts = [], lPts = [];
+        const aP = Math.atan2(dot3(B,pvD), dot3(A,pvD));
+        for (let k=0;k<=M;k++){
+          const a = aP - Math.PI/2 + Math.PI*k/M;
+          tPts.push([Math.cos(a)*A[0]+Math.sin(a)*B[0],
+                     Math.cos(a)*A[1]+Math.sin(a)*B[1],
+                     Math.cos(a)*A[2]+Math.sin(a)*B[2]]);
+        }
+        const psiM = Math.atan2(dot3(pvU,sunD), dot3(pvR,sunD));
+        for (let k=0;k<=M;k++){
+          const ps = psiM + Math.PI/2 + Math.PI*k/M;
+          lPts.push([Math.cos(ps)*pvR[0]+Math.sin(ps)*pvU[0],
+                     Math.cos(ps)*pvR[1]+Math.sin(ps)*pvU[1],
+                     Math.cos(ps)*pvR[2]+Math.sin(ps)*pvU[2]]);
+        }
+        const tEnd = tPts[tPts.length-1];
+        const d0 = (lPts[0][0]-tEnd[0])**2 + (lPts[0][1]-tEnd[1])**2 + (lPts[0][2]-tEnd[2])**2;
+        const d1 = (lPts[M][0]-tEnd[0])**2 + (lPts[M][1]-tEnd[1])**2 + (lPts[M][2]-tEnd[2])**2;
+        const limb = d0 <= d1 ? lPts : lPts.slice().reverse();
+        c.beginPath();
+        tPts.concat(limb).forEach((p,kk)=>{
+          const q = pj(p);
+          kk ? c.lineTo(q[0],q[1]) : c.moveTo(q[0],q[1]);
+        });
+        c.closePath();
+        c.fillStyle = NIGHT; c.fill();
+        c.beginPath();                                    // 晨昏线
+        tPts.forEach((p,kk)=>{
+          const q = pj(p);
+          kk ? c.lineTo(q[0],q[1]) : c.moveTo(q[0],q[1]);
+        });
+        c.strokeStyle = 'rgba(255,232,160,.5)'; c.lineWidth = 0.8; c.stroke();
+      }
+    }
+  }
+
+  // ---- 太阳直射点（正对太阳的那一点） ----
+  if (showDN && dot3(sunD, pvD) > 0.14){                 // 太靠边缘就不画，免得像球外的星点
+    const q = pj(sunD);
+    const g2 = c.createRadialGradient(q[0],q[1],0.4, q[0],q[1],gR*0.36);
+    g2.addColorStop(0,'rgba(255,248,200,.95)');
+    g2.addColorStop(0.4,'rgba(255,206,80,.5)');
+    g2.addColorStop(1,'rgba(255,190,60,0)');
+    c.fillStyle = g2; c.beginPath(); c.arc(q[0],q[1],gR*0.36,0,TAU); c.fill();
+    c.beginPath(); c.arc(q[0],q[1],Math.max(1.3, gR*0.13),0,TAU);
+    c.fillStyle = '#fff8d6'; c.fill();
+  }
+  c.restore();
+
+  c.strokeStyle = 'rgba(178,212,240,.55)'; c.lineWidth = 0.8;   // 球缘
+  c.beginPath(); c.arc(gx, gy, gR, 0, TAU); c.stroke();
+}
+
+function drawPrecWin(){
+  if (!precWin.classList.contains('show')) return;
+  const c = pctx, font = '"Segoe UI","Microsoft YaHei",sans-serif';
+  c.setTransform(dpr2*precScale,0,0,dpr2*precScale,0,0);
+  c.clearRect(0,0,PC_W,PC_H);
+  const cx = PC_W/2, cy = PC_H/2, Rorb = ORB_R;          // 正俯视：上下对称取中
+  const D = sunDay();                                 // 连续天数，直接由当前日期换算
+  const ph = SUN_RATE*D - TH_SPRING;                  // 相对「春分」逆时针转过的公转角（°），随时间增大
+  const thN = ((ph % 360) + 360) % 360;               // 归一化：0°=春分、90°=夏至、180°=秋分、270°=冬至
+  const pr = ph*DEG;
+  c.lineCap = 'round';
+
+  /* ---------- 地球在轨道上的 3D 位置 ---------- */
+  const E3 = orbPos(pr, Rorb);                        // 世界坐标（黄道面内）
+  const exy = pScreen(E3, cx, cy);
+  const ex = exy[0], ey = exy[1];
+  const depth = dot3(E3, pvD)/Rorb;                   // +1 最靠近相机 … -1 最远（正俯视时恒为 0）
+  const eR = Math.max(9, 16*pZoom)*(1 + 0.11*depth);                   // 斜侧视角时近处略大、远处略小，增强立体感
+  const sunD = [-E3[0]/Rorb, 0, -E3[2]/Rorb];         // 地球 → 太阳（单位向量）
+
+  /* ---------- 惯性参考方向：世界 +x 轴（屏幕上始终水平） ---------- */
+  c.strokeStyle = 'rgba(165,175,185,.30)'; c.lineWidth = 1; c.setLineDash([3,4]);
+  c.beginPath(); c.moveTo(cx-Rorb-6, cy); c.lineTo(cx+Rorb+6, cy); c.stroke();
+  c.setLineDash([]);
+
+  /* ---------- 公转轨道：斜侧视角时远侧暗、近侧亮，形成 3D 纵深 ----------
+     正俯视（北极上空）时轨道投影成正圆、没有远近之分，整圈用同一亮度 */
+  const arcSeg = (p0,p1,color,lw)=>{
+    c.strokeStyle = color; c.lineWidth = lw; c.setLineDash([4,4]);
+    c.beginPath();
+    for (let k=0;k<=40;k++){
+      const p = pScreen(orbPos(p0 + (p1-p0)*k/40, Rorb), cx, cy);
+      k ? c.lineTo(p[0],p[1]) : c.moveTo(p[0],p[1]);
+    }
+    c.stroke(); c.setLineDash([]);
+  };
+  if (pFlat > 0.995){
+    arcSeg(0, TAU, 'rgba(170,186,208,.58)', 1.1);                                    // 正俯视：整圈同亮
+  } else {
+    // 景深 = -cos(pr - az)：随视角方位角旋转，远侧永远偏暗、近侧偏亮
+    arcSeg(viewAz - Math.PI/2, viewAz + Math.PI/2, 'rgba(140,155,175,.34)', 1);      // 远侧
+    arcSeg(viewAz + Math.PI/2, viewAz + Math.PI*1.5, 'rgba(168,184,205,.62)', 1.15); // 近侧
+  }
+
+  /* ---------- 四季刻度短线（画在地球之前：地球到位时正好骑在刻度上） ----------
+     刻度与文字都沿「轨道投影的外法向」按固定像素偏移（正俯视时即屏幕径向），
+     这样斜侧视角把纵向压扁后，纵向的刻度也不会变得又短又贴球 */
+  const q = Math.floor(thN/90);                       // 当前季度：0 春分→夏至 …
+  const orbPt = deg => pScreen(orbPos(deg*DEG, Rorb), cx, cy);
+  /* 投影后的轨道是「轴对齐椭圆」，半轴 a=ORB_R·pZoom（横向）、b=a·sin(视角高度)（纵向）。
+     刻度与文字沿该椭圆的**外法向**外推（而不是从圆心放射），低视角压扁时文字才贴着椭圆、
+     不会横穿轨道或挤向中心。 */
+  const EA = Rorb*pZoom, EB = Math.max(8, EA*pFlat);    // 正俯视 EB=EA → 正圆
+  const radDir = deg => {
+    const p = orbPt(deg), dx = p[0]-cx, dy = p[1]-cy;
+    let nx = dx/(EA*EA), ny = dy/(EB*EB);
+    const n = Math.hypot(nx,ny) || 1;
+    return [nx/n, ny/n];
+  };
+  const seasonPt = (deg, off)=>{                      // 椭圆端点 + 沿法向外推 off 像素
+    const p = orbPt(deg), d = radDir(deg), o = off*pZoom;
+    return [p[0] + d[0]*o, p[1] + d[1]*o];
+  };
+  for (let k=0;k<4;k++){
+    const on = (k === q), a = SEASONS[k].ph;
+    const p1 = seasonPt(a, -7), p2 = seasonPt(a, 7);
+    c.strokeStyle = on ? 'rgba(255,215,110,.9)' : 'rgba(160,180,205,.38)';
+    c.lineWidth = on ? 1.9 : 1.3;
+    c.beginPath(); c.moveTo(p1[0],p1[1]); c.lineTo(p2[0],p2[1]); c.stroke();
+  }
+
+  /* ---------- 太阳（球体：径向渐变，中心亮） ---------- */
+  const sr = 11;
+  const sg = c.createRadialGradient(cx-sr*0.25, cy-sr*0.3, 1, cx, cy, sr*1.9);
+  sg.addColorStop(0,'#fff6d2');
+  sg.addColorStop(.32,'#ffdc7a');
+  sg.addColorStop(.62,'rgba(255,190,60,.55)');
+  sg.addColorStop(1,'rgba(255,190,60,0)');
+  c.fillStyle = sg; c.beginPath(); c.arc(cx,cy,sr*1.9,0,TAU); c.fill();
+  c.fillStyle = '#ffcf5a'; c.beginPath(); c.arc(cx,cy,sr*0.62,0,TAU); c.fill();
+  // 太阳标签自动避让：地球跑到下方（秋分一侧）时，标签翻到太阳上方
+  const sunUp = (ey > cy + 8) && Math.abs(ex-cx) < 48;   // 地球正压在太阳下方时才翻到上方
+  const sunLabY = sunUp ? cy - sr*1.9 - 2 : cy + sr*1.9 + 2;
+  c.fillStyle = '#ffe9a8'; c.font = '11px '+font;
+  c.textAlign = 'center'; c.textBaseline = sunUp ? 'bottom' : 'top';
+  c.lineWidth = 3; c.strokeStyle = '#212327'; c.strokeText('太阳', cx, sunLabY);
+  c.fillText('太阳', cx, sunLabY);
+
+  /* ---------- 日地连线：太阳中心 → 地球边缘（黄道面内的直线，投影后仍是直线） ---------- */
+  const sdx = cx-ex, sdy = cy-ey, sdn = Math.hypot(sdx,sdy) || 1;
+  const ux = sdx/sdn, uy = sdy/sdn;                   // 地球 → 太阳 的屏幕单位向量
+  c.strokeStyle = 'rgba(255,205,90,.85)'; c.setLineDash([5,4]); c.lineWidth = 1;
+  c.beginPath();
+  c.moveTo(cx - ux*sr*0.95, cy - uy*sr*0.95);
+  c.lineTo(ex + ux*(eR+3), ey + uy*(eR+3));
+  c.stroke(); c.setLineDash([]);
+
+  /* ---------- 风云E星轨道面与黄道面的交线：过地心、⊥ 日地连线（黄道面内） ---------- */
+  const tW = [Math.cos(pr), 0, -Math.sin(pr)];        // 与日地连线垂直、且躺在黄道面内
+  const tS = pScreen([tW[0], tW[1], tW[2]], 0, 0);    // 方向向量的屏幕增量（原点投影为 0,0）
+  const tLen = Math.hypot(tS[0], tS[1]) || 1;
+  const gnx = tS[0]/tLen, gny = tS[1]/tLen;           // 绿线在屏幕上的单位方向
+  c.strokeStyle = '#8fd48f'; c.lineWidth = 1.6;
+  c.beginPath();
+  c.moveTo(ex + gnx*34*pZoom, ey + gny*34*pZoom);
+  c.lineTo(ex - gnx*34*pZoom, ey - gny*34*pZoom);
+  c.stroke();
+
+  /* ---------- 「若无进动」：惯性系中固定的 +x 方向（屏幕上水平） ---------- */
+  if (Math.abs(ph) > 2){
+    c.strokeStyle = 'rgba(210,215,225,.42)'; c.lineWidth = 1.2; c.setLineDash([6,5]);
+    c.beginPath(); c.moveTo(ex-34*pZoom, ey); c.lineTo(ex+34*pZoom, ey); c.stroke();
+    c.setLineDash([]);
+  }
+
+  /* ---------- 地球：与主 3D 相同的球体模型 ---------- */
+  drawPrecGlobe(c, ex, ey, eR, sunD, -ph*2.2);
+
+  /* ---------- 「地球」标签：8 个方向里挑最空的一个 ---------- */
+  c.fillStyle = '#dfe9ff'; c.font = '11px '+font;
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  const labelPts = [];
+  for (let k=0;k<4;k++) labelPts.push(seasonPt(SEASONS[k].ph, SEASON_OFF));
+  function epScore(p){
+    let m = Math.min(p.x-15, PC_W-15-p.x, p.y-9, PC_H-9-p.y);
+    for (const q2 of labelPts) m = Math.min(m, Math.hypot(p.x-q2[0], p.y-q2[1]) - 27);
+    m = Math.min(m, Math.hypot(p.x-cx, p.y-cy) - 32);   // 别压住太阳
+    return m;
+  }
+  const angSun = Math.atan2(uy, ux);                  // 地球 → 太阳 的屏幕角
+  const angGrn = Math.atan2(gny, gnx);
+  let ep = null, ebest = -1e9;
+  for (let k=0;k<8;k++){
+    const a2 = k*Math.PI/4;
+    const p2 = {x: ex+Math.cos(a2)*(eR+14), y: ey+Math.sin(a2)*(eR+14)};
+    const s2 = epScore(p2)
+      - 26*Math.pow(Math.cos(a2-angGrn),2)             // 避开绿色轨道面线（两侧都算）
+      - 12*Math.pow(Math.cos(a2-angSun),2);            // 避开黄色日地连线
+    if (s2 > ebest){ ebest = s2; ep = p2; }
+  }
+  const elx = Math.max(16, Math.min(PC_W-16, ep.x));
+  const ely = Math.max(12, Math.min(PC_H-10, ep.y));
+  c.lineWidth = 3; c.strokeStyle = '#212327'; c.strokeText('地球', elx, ely);   // 描边晕影：压在线上也读得清
+  c.fillText('地球', elx, ely);
+
+  /* ---------- 四季方位文字（最后画，压在最上层才读得清）：上=春分、左=夏至、下=秋分、右=冬至 ---------- */
+  for (let k=0;k<4;k++){
+    const s = SEASONS[k], on = (k === q);
+    const p = seasonPt(s.ph, SEASON_OFF);
+    c.font = '10.5px '+font;
+    // 文字朝「远离圆心」的一侧排，跟随视角旋转（不再写死上下左右）
+    const sdx2 = p[0]-cx, sdy2 = p[1]-cy;
+    c.textAlign = sdx2 > 10 ? 'left' : (sdx2 < -10 ? 'right' : 'center');
+    c.textBaseline = sdy2 > 7 ? 'top' : (sdy2 < -7 ? 'bottom' : 'middle');
+    // 夹在画布内：文字朝外排时，锚点也要留出字身厚度
+    let lx2 = Math.max(12, Math.min(PC_W-12, p[0]));
+    let ly2 = Math.max(11, Math.min(PC_H-11, p[1]));
+    if (c.textAlign === 'left')  lx2 = Math.min(lx2, PC_W-28);
+    if (c.textAlign === 'right') lx2 = Math.max(lx2, 28);
+    if (c.textBaseline === 'top') ly2 = Math.min(ly2, PC_H-14);
+    if (c.textBaseline === 'bottom') ly2 = Math.max(ly2, 14);
+    c.lineWidth = 3; c.strokeStyle = '#212327';        // 深色描边（晕影），压在其它线上也读得清
+    c.strokeText(s.name, lx2, ly2);
+    c.fillStyle = on ? '#ffd76e' : 'rgba(176,195,216,.78)';
+    c.fillText(s.name, lx2, ly2);
+  }
+
+  precInfo.innerHTML =
+    '<span style="color:#8fd48f">━</span> 实际轨道面　' +
+    '<span style="color:rgba(210,215,225,.7)">┄</span> 若无进动　' +
+    '<span style="color:rgba(165,175,185,.85)">视角 <b>90°</b>·北极上空俯视</span><br>' +
+    '日期 <b>' + dateStr(nowDate()) + '</b>　年内第 <b>' + (yearFrac(nowDate())+1).toFixed(1) + '</b> 天<br>' +
+    '公转 <b>' + thN.toFixed(1) + '°</b>　进动 <b>' + thN.toFixed(1) + '°</b>　直射点 <b>' +
+    Math.abs(subsolarLat()).toFixed(1) + '°' + (subsolarLat()>=0?'N':'S') + '</b><br>' +
+    '每天东进 <b>0.9856°</b>（J2 摄动）＝公转角速度，与日地连线恒成 <b>90°</b>（晨昏轨道）';
+}
+
 /* ================= 启动 ================= */
 // 支持 #tsat=24&incl=60&node=105&phase=0 形式的初始参数
 try{
   const hp = new URLSearchParams(location.hash.replace(/^#/,''));
   if (hp.has('tsat'))  S.tsat  = clamp(+hp.get('tsat'),0,24);
-  if (hp.has('incl'))  S.incl  = clamp(+hp.get('incl'),-90,90);
+  if (hp.has('incl'))  S.incl  = clamp(+hp.get('incl'),-180,180);
   if (hp.has('node'))  S.node  = clamp(+hp.get('node'),0,360);
   if (hp.has('phase')) S.phase = clamp(+hp.get('phase'),0,360);
   if (hp.has('t'))     S.t     = clamp(+hp.get('t'),0,2400);
+  if (hp.has('date')){
+    const p = hp.get('date').split('-').map(Number);
+    if (p.length === 3 && p.every(isFinite)) dateBase = new Date(p[0], p[1]-1, p[2]);
+  }
   $('inTsat').value = S.tsat; $('inIncl').value = S.incl;
   if (hp.has('ra')){
     const R = ((+hp.get('ra') % 360) + 360) % 360;
@@ -1212,6 +2016,7 @@ syncLabels();
 buildOrbit();
 resizeAll();
 syncEastInput(); syncLLInput();
+syncDateUI(true);
 
 setPlaying(true);
 
@@ -1220,8 +2025,18 @@ try{
   const hq = new URLSearchParams(location.hash.replace(/^#/,''));
   if (hq.has('east')) applyEastClock(parseClock(hq.get('east')));
   if (hq.has('lat') && hq.has('lon')) applyLatLon(+hq.get('lat'), +hq.get('lon'));
+  if (hq.has('dn')) showDN = hq.get('dn') !== '0';
   if (hq.has('east') || hq.has('lat') || hq.has('pause')) setPlaying(false);
 }catch(e){}
+
+/* 昼夜分布开关（平面图按钮，同时控制 3D 视图） */
+const btnDN = document.getElementById('btnDN');
+function syncDNBtn(){
+  btnDN.textContent = '昼夜分布：' + (showDN ? '开' : '关');
+  btnDN.classList.toggle('off', !showDN);
+}
+btnDN.addEventListener('click', ()=>{ showDN = !showDN; syncDNBtn(); });
+syncDNBtn();
 const ro = new ResizeObserver(()=>{ if (ro._q) return; ro._q = requestAnimationFrame(()=>{ ro._q=0; resizeAll(); }); });
 ro.observe(mapBox); ro.observe(document.getElementById('right'));
 window.addEventListener('resize', resizeAll);
