@@ -486,10 +486,10 @@ const cross3 = (a,b)=> [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]
 const norm3 = a => { const m=Math.hypot(a[0],a[1],a[2])||1; return [a[0]/m,a[1]/m,a[2]/m]; };
 
 /* ================= 状态 ================= */
-/* 默认参数（页面打开与「重置」都回到这一组）＝「预设·风云E星」
-   风云三号E星：T=1.7h、i=98.8°、太阳同步晨昏轨道 LTAN 06:00 ⇒ Ω=αs+6×(−15)=210°；
-   phase 使 19:00（t=67h）时卫星正位于最东点（u=90°，约 81.2°N 极区），
-   u = 2π·t/T + phase ⇒ phase = 90° − 360°×67/1.7 = 301.8° */
+/* 默认轨道参数（页面打开与「重置」都回到这一组）＝「预设·风云E星」
+   风云三号E星：T=1.7h、i=98.8°、太阳同步晨昏轨道 LTAN 06:00 ⇒ Ω=αs+6×(−15)=210°。
+   phase 以 19:00（t=67h）位于最东点（u=90°）为几何锚点反解：phase = 90° − 360°×67/1.7 = 301.8°；
+   页面打开时 t 实际取「系统当前时刻」（当天 0 点起算，含分秒），卫星沿轨道位置随之变化 */
 const DEFAULTS = { tsat:1.7, incl:98.8, node:210, phase:301.8, t:67 };
 const S = {
   phase: DEFAULTS.phase,   // 沿轨相位（度），由「定位」反解，不再有独立滑块
@@ -1542,10 +1542,11 @@ function resetSats(){
 }
 $('btnReset').addEventListener('click', ()=>{
   resetSats();
-  S.t = DEFAULTS.t;                                   // 时刻回 19:00（lastT 下一帧自动对齐）
+  const nwR = new Date();                             // 日期/时刻都回系统当前时间
+  dateBase = new Date(nwR.getFullYear(), nwR.getMonth(), nwR.getDate());
+  S.t = (nwR - dateBase) / 3600000;                   // 当天 0 点起算（lastT 下一帧自动对齐）
   S.rot = 24;                                         // 自转周期回太阳日
   [...$('segRot').children].forEach(x=>x.classList.toggle('on', x.dataset.v === '24'));
-  dateBase = new Date(new Date().getFullYear(), 0, 1); // 日期回默认（当年 1 月 1 日）
   syncDateUI(true);
   setRAField(eastRANow());                // 默认 Ω=210 ⇒ α=300.0（与联动规则一致）
   setPlaying(false);
@@ -2203,6 +2204,11 @@ function drawPrecWin(){
 }
 
 /* ================= 启动 ================= */
+// 仿真起始时间＝系统当前时刻：日期取今天、时刻取本机钟面（分秒计入小数小时）
+// 之后仍可用 #date= / #t= 等哈希参数覆盖
+const nowNow = new Date();
+dateBase = new Date(nowNow.getFullYear(), nowNow.getMonth(), nowNow.getDate());
+S.t = (nowNow - dateBase) / 3600000;          // 当天 0 点起算的小时数（含分秒）
 // 支持 #tsat=24&incl=60&node=105&phase=0 形式的初始参数
 try{
   const hp = new URLSearchParams(location.hash.replace(/^#/,''));
